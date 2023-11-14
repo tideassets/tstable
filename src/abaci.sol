@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 interface Abacus {
     // 1st arg: initial price               [ray]
@@ -47,7 +47,7 @@ contract LinearDecrease is Abacus {
     event File(bytes32 indexed what, uint256 data);
 
     // --- Init ---
-    constructor() public {
+    constructor() {
         wards[msg.sender] = 1;
         emit Rely(msg.sender);
     }
@@ -112,7 +112,7 @@ contract StairstepExponentialDecrease is Abacus {
     // --- Init ---
     // @notice: `cut` and `step` values must be correctly set for
     //     this contract to return a valid price
-    constructor() public {
+    constructor() {
         wards[msg.sender] = 1;
         emit Rely(msg.sender);
     }
@@ -201,7 +201,7 @@ contract ExponentialDecrease is Abacus {
     // --- Init ---
     // @notice: `cut` value must be correctly set for
     //     this contract to return a valid price
-    constructor() public {
+    constructor() {
         wards[msg.sender] = 1;
         emit Rely(msg.sender);
     }

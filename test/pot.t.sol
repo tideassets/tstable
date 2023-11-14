@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 import {Vat} from '../src/vat.sol';
@@ -73,7 +73,7 @@ contract DSRTest is DSTest {
     function test_save_1d() public {
         pot.join(100 ether);
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.drip();
         assertEq(pot.pie(self), 100 ether);
         pot.exit(100 ether);
@@ -82,11 +82,11 @@ contract DSRTest is DSTest {
     function test_drip_multi() public {
         pot.join(100 ether);
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.drip();
         assertEq(wad(vat.dai(potb)),   105 ether);
         pot.file("dsr", uint(1000001103127689513476993127));  // 10% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.drip();
         assertEq(wad(vat.sin(vow)), 15.5 ether);
         assertEq(wad(vat.dai(potb)), 115.5 ether);
@@ -96,28 +96,28 @@ contract DSRTest is DSTest {
     function test_drip_multi_inBlock() public {
         pot.drip();
         uint rho = pot.rho();
-        assertEq(rho, now);
-        hevm.warp(now + 1 days);
+        assertEq(rho, block.timestamp);
+        hevm.warp(block.timestamp + 1 days);
         rho = pot.rho();
-        assertEq(rho, now - 1 days);
+        assertEq(rho, block.timestamp - 1 days);
         pot.drip();
         rho = pot.rho();
-        assertEq(rho, now);
+        assertEq(rho, block.timestamp);
         pot.drip();
         rho = pot.rho();
-        assertEq(rho, now);
+        assertEq(rho, block.timestamp);
     }
     function test_save_multi() public {
         pot.join(100 ether);
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.drip();
         pot.exit(50 ether);
         assertEq(wad(vat.dai(self)), 52.5 ether);
         assertEq(pot.Pie(),          50.0 ether);
 
         pot.file("dsr", uint(1000001103127689513476993127));  // 10% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.drip();
         pot.exit(50 ether);
         assertEq(wad(vat.dai(self)), 110.25 ether);
@@ -125,9 +125,9 @@ contract DSRTest is DSTest {
     }
     function test_fresh_chi() public {
         uint rho = pot.rho();
-        assertEq(rho, now);
-        hevm.warp(now + 1 days);
-        assertEq(rho, now - 1 days);
+        assertEq(rho, block.timestamp);
+        hevm.warp(block.timestamp + 1 days);
+        assertEq(rho, block.timestamp - 1 days);
         pot.drip();
         pot.join(100 ether);
         assertEq(pot.pie(self), 100 ether);
@@ -138,16 +138,16 @@ contract DSRTest is DSTest {
     function testFail_stale_chi() public {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
         pot.drip();
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         pot.join(100 ether);
     }
     function test_file() public {
-        hevm.warp(now + 1);
+        hevm.warp(block.timestamp + 1);
         pot.drip();
         pot.file("dsr", uint(1));
     }
     function testFail_file() public {
-        hevm.warp(now + 1);
+        hevm.warp(block.timestamp + 1);
         pot.file("dsr", uint(1));
     }
 }

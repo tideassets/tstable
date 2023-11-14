@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 interface VatLike {
     function move(address,address,uint256) external;
@@ -134,7 +134,7 @@ contract Clipper {
     event Yank(uint256 id);
 
     // --- Init ---
-    constructor(address vat_, address spotter_, address dog_, bytes32 ilk_) public {
+    constructor(address vat_, address spotter_, address dog_, bytes32 ilk_) {
         vat     = VatLike(vat_);
         spotter = SpotterLike(spotter_);
         dog     = DogLike(dog_);

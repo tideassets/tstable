@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 interface VatLike {
     function dai(address) external view returns (uint256);
@@ -159,7 +159,7 @@ interface CureLike {
            cage administrator.
 
            This takes a fairly predictable time to occur but with altered
-           auction dynamics due to the now varying price of dai.
+           auction dynamics due to the block.timestamp varying price of dai.
 
        ii) `skip`: cancel all ongoing auctions and seize the collateral.
 
@@ -211,7 +211,7 @@ interface CureLike {
         - adjusts the `fix` in the case of deficit / surplus
 
     At this point we have computed the final price for each collateral
-    type and dai holders can now turn their dai into collateral. Each
+    type and dai holders can block.timestamp turn their dai into collateral. Each
     unit dai can claim a fixed basket of collateral.
 
     Dai holders must first `pack` some dai into a `bag`. Once packed,
@@ -280,7 +280,7 @@ contract End {
     event Cash(bytes32 indexed ilk, address indexed usr, uint256 wad);
 
     // --- Init ---
-    constructor() public {
+    constructor() {
         wards[msg.sender] = 1;
         live = 1;
         emit Rely(msg.sender);

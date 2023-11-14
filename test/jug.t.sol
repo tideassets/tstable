@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 
@@ -38,7 +38,7 @@ interface VatLike {
 }
 
 contract Rpow is Jug {
-    constructor(address vat_) public Jug(vat_){}
+    constructor(address vat_) Jug(vat_){}
 
     function pRpow(uint x, uint n, uint b) public pure returns(uint) {
         return _rpow(x, n, b);
@@ -95,27 +95,27 @@ contract JugTest is DSTest {
 
     function test_drip_setup() public {
         hevm.warp(0);
-        assertEq(uint(now), 0);
+        assertEq(uint(block.timestamp), 0);
         hevm.warp(1);
-        assertEq(uint(now), 1);
+        assertEq(uint(block.timestamp), 1);
         hevm.warp(2);
-        assertEq(uint(now), 2);
+        assertEq(uint(block.timestamp), 2);
         assertEq(Art("i"), 100 ether);
     }
     function test_drip_updates_rho() public {
         jug.init("i");
-        assertEq(rho("i"), now);
+        assertEq(rho("i"), block.timestamp);
 
         jug.file("i", "duty", 10 ** 27);
         jug.drip("i");
-        assertEq(rho("i"), now);
-        hevm.warp(now + 1);
-        assertEq(rho("i"), now - 1);
+        assertEq(rho("i"), block.timestamp);
+        hevm.warp(block.timestamp + 1);
+        assertEq(rho("i"), block.timestamp - 1);
         jug.drip("i");
-        assertEq(rho("i"), now);
-        hevm.warp(now + 1 days);
+        assertEq(rho("i"), block.timestamp);
+        hevm.warp(block.timestamp + 1 days);
         jug.drip("i");
-        assertEq(rho("i"), now);
+        assertEq(rho("i"), block.timestamp);
     }
     function test_drip_file() public {
         jug.init("i");
@@ -135,7 +135,7 @@ contract JugTest is DSTest {
         jug.file("vow", ali);
 
         jug.file("i", "duty", 1000000564701133626865910626);  // 5% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         assertEq(wad(vat.dai(ali)), 0 ether);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)), 5 ether);
@@ -145,7 +145,7 @@ contract JugTest is DSTest {
         jug.file("vow", ali);
         jug.file("i", "duty", 1000000564701133626865910626);  // 5% / day
 
-        hevm.warp(now + 2 days);
+        hevm.warp(block.timestamp + 2 days);
         assertEq(wad(vat.dai(ali)), 0 ether);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)), 10.25 ether);
@@ -155,7 +155,7 @@ contract JugTest is DSTest {
         jug.file("vow", ali);
 
         jug.file("i", "duty", 1000000564701133626865910626);  // 5% / day
-        hevm.warp(now + 3 days);
+        hevm.warp(block.timestamp + 3 days);
         assertEq(wad(vat.dai(ali)), 0 ether);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)), 15.7625 ether);
@@ -165,7 +165,7 @@ contract JugTest is DSTest {
         jug.file("vow", ali);
 
         jug.file("i", "duty", 999999706969857929985428567);  // -2.5% / day
-        hevm.warp(now + 3 days);
+        hevm.warp(block.timestamp + 3 days);
         assertEq(wad(vat.dai(address(this))), 100 ether);
         vat.move(address(this), ali, rad(100 ether));
         assertEq(wad(vat.dai(ali)), 100 ether);
@@ -178,11 +178,11 @@ contract JugTest is DSTest {
         jug.file("vow", ali);
 
         jug.file("i", "duty", 1000000564701133626865910626);  // 5% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)), 5 ether);
         jug.file("i", "duty", 1000001103127689513476993127);  // 10% / day
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)),  15.5 ether);
         assertEq(wad(vat.debt()),     115.5 ether);
@@ -199,19 +199,19 @@ contract JugTest is DSTest {
         jug.file("i", "duty", 1050000000000000000000000000);  // 5% / second
         jug.file("j", "duty", 1000000000000000000000000000);  // 0% / second
         jug.file("base",  uint(50000000000000000000000000)); // 5% / second
-        hevm.warp(now + 1);
+        hevm.warp(block.timestamp + 1);
         jug.drip("i");
         assertEq(wad(vat.dai(ali)), 10 ether);
     }
     function test_file_duty() public {
         jug.init("i");
-        hevm.warp(now + 1);
+        hevm.warp(block.timestamp + 1);
         jug.drip("i");
         jug.file("i", "duty", 1);
     }
     function testFail_file_duty() public {
         jug.init("i");
-        hevm.warp(now + 1);
+        hevm.warp(block.timestamp + 1);
         jug.file("i", "duty", 1);
     }
     function test_rpow() public {

@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 interface ClipperLike {
     function ilk() external view returns (bytes32);
@@ -99,7 +99,7 @@ contract Dog {
     event Cage();
 
     // --- Init ---
-    constructor(address vat_) public {
+    constructor(address vat_) {
         vat = VatLike(vat_);
         live = 1;
         wards[msg.sender] = 1;

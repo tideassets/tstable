@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import {DSTest}  from "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
@@ -29,7 +29,7 @@ interface Hevm {
 
 contract Guy {
     Flopper flop;
-    constructor(Flopper flop_) public {
+    constructor(Flopper flop_) {
         flop = flop_;
         Vat(address(flop.vat())).hope(address(flop));
         DSToken(address(flop.gem())).approve(address(flop));
@@ -80,7 +80,7 @@ contract Gal {
 contract Vatish is DSToken('') {
     uint constant ONE = 10 ** 27;
     function hope(address usr) public {
-         approve(usr, uint(-1));
+         approve(usr, type(uint).max);
     }
     function dai(address usr) public view returns (uint) {
          return balanceOf[usr];
@@ -140,7 +140,7 @@ contract FlopTest is DSTest {
         assertEq(lot, 200 ether);
         assertTrue(guy == gal);
         assertEq(uint256(tic), 0);
-        assertEq(uint256(end), now + flop.tau());
+        assertEq(uint256(end), block.timestamp + flop.tau());
     }
 
     function test_dent() public {
@@ -161,7 +161,7 @@ contract FlopTest is DSTest {
         // gal receives no more
         assertEq(vat.dai(gal), 10 ether);
 
-        hevm.warp(now + 5 weeks);
+        hevm.warp(block.timestamp + 5 weeks);
         assertEq(gem.totalSupply(),  0 ether);
         gem.setOwner(address(flop));
         Guy(bob).deal(id);
@@ -193,7 +193,7 @@ contract FlopTest is DSTest {
         // gal receives no more
         assertEq(vat.dai(gal), 10 ether);
 
-        hevm.warp(now + 5 weeks);
+        hevm.warp(block.timestamp + 5 weeks);
         assertEq(gem.totalSupply(),  0 ether);
         gem.setOwner(address(flop));
         Guy(bob).deal(id);
@@ -217,7 +217,7 @@ contract FlopTest is DSTest {
         // check no tick
         assertTrue(!Guy(ali).try_tick(id));
         // run past the end
-        hevm.warp(now + 2 weeks);
+        hevm.warp(block.timestamp + 2 weeks);
         // check not biddable
         assertTrue(!Guy(ali).try_dent(id, 100 ether, 10 ether));
         assertTrue( Guy(ali).try_tick(id));
@@ -233,7 +233,7 @@ contract FlopTest is DSTest {
         // be refundable to the creator. Rather, it ticks indefinitely.
         uint id = Gal(gal).kick(flop, /*lot*/ 200 ether, /*bid*/ 10 ether);
         assertTrue(!Guy(ali).try_deal(id));
-        hevm.warp(now + 2 weeks);
+        hevm.warp(block.timestamp + 2 weeks);
         assertTrue(!Guy(ali).try_deal(id));
         assertTrue( Guy(ali).try_tick(id));
         assertTrue(!Guy(ali).try_deal(id));

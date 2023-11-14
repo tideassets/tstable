@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 
@@ -84,7 +84,7 @@ contract VowTest is DSTest {
             revert(free, 32)
         }
     }
-    function can_flap() public returns (bool) {
+    function can_flap() public returns (bool r) {
         string memory sig = "flap()";
         bytes memory data = abi.encodeWithSignature(sig);
 
@@ -94,7 +94,7 @@ contract VowTest is DSTest {
         ok = abi.decode(success, (bool));
         if (ok) return true;
     }
-    function can_flop() public returns (bool) {
+    function can_flop() public returns (bool r) {
         string memory sig = "flop()";
         bytes memory data = abi.encodeWithSignature(sig);
 
@@ -117,7 +117,7 @@ contract VowTest is DSTest {
     }
     function flog(uint wad) internal {
         suck(address(0), wad);  // suck dai into the zero address
-        vow.flog(now);
+        vow.flog(block.timestamp);
     }
     function heal(uint wad) internal {
         vow.heal(rad(wad));
@@ -148,7 +148,7 @@ contract VowTest is DSTest {
         vow.file('wait', uint(100 seconds));
         assertEq(vow.wait(), 100 seconds);
 
-        uint tic = now;                                                                                                                                                       
+        uint tic = block.timestamp;                                                                                                                                                       
         vow.fess(100 ether);                                                     
         hevm.warp(tic + 99 seconds);                                             
         assertTrue(!try_flog(tic) );                                             

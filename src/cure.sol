@@ -58,7 +58,7 @@ contract Cure {
         require((z = x - y) <= x, "Cure/sub-underflow");
     }
 
-    constructor() public {
+    constructor() {
         live = 1;
         wards[msg.sender] = 1;
         emit Rely(msg.sender);

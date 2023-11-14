@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 // FIXME: This contract was altered compared to the production version.
 // It doesn't use LibNote anymore.
@@ -72,7 +72,7 @@ contract Vow {
     uint256 public live;  // Active Flag
 
     // --- Init ---
-    constructor(address vat_, address flapper_, address flopper_) public {
+    constructor(address vat_, address flapper_, address flopper_) {
         wards[msg.sender] = 1;
         vat     = VatLike(vat_);
         flapper = FlapLike(flapper_);
@@ -114,12 +114,12 @@ contract Vow {
 
     // Push to debt-queue
     function fess(uint tab) external auth {
-        sin[now] = add(sin[now], tab);
+        sin[block.timestamp] = add(sin[block.timestamp], tab);
         Sin = add(Sin, tab);
     }
     // Pop from debt-queue
     function flog(uint era) external {
-        require(add(era, wait) <= now, "Vow/wait-not-finished");
+        require(add(era, wait) <= block.timestamp, "Vow/wait-not-finished");
         Sin = sub(Sin, sin[era]);
         sin[era] = 0;
     }

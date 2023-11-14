@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 import "ds-token/token.sol";
@@ -24,7 +24,7 @@ import {Vat} from '../src/vat.sol';
 
 contract Usr {
     Vat public vat;
-    constructor(Vat vat_) public {
+    constructor(Vat vat_) {
         vat = vat_;
     }
     function try_call(address addr, bytes calldata data) external returns (bool) {
@@ -37,7 +37,7 @@ contract Usr {
             revert(free, 32)
         }
     }
-    function can_frob(bytes32 ilk, address u, address v, address w, int dink, int dart) public returns (bool) {
+    function can_frob(bytes32 ilk, address u, address v, address w, int dink, int dart) public returns (bool r) {
         string memory sig = "frob(bytes32,address,address,address,int256,int256)";
         bytes memory data = abi.encodeWithSignature(sig, ilk, u, v, w, dink, dart);
 
@@ -47,7 +47,7 @@ contract Usr {
         ok = abi.decode(success, (bool));
         if (ok) return true;
     }
-    function can_fork(bytes32 ilk, address src, address dst, int dink, int dart) public returns (bool) {
+    function can_fork(bytes32 ilk, address src, address dst, int dink, int dart) public returns (bool r) {
         string memory sig = "fork(bytes32,address,address,int256,int256)";
         bytes memory data = abi.encodeWithSignature(sig, ilk, src, dst, dink, dart);
 

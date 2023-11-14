@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 
@@ -37,7 +37,7 @@ contract ClipperTest is DSTest {
     bytes20 constant CHEAT_CODE =
         bytes20(uint160(uint256(keccak256('hevm cheat code'))));
 
-    uint256 constant startTime = 604411200; // Used to avoid issues with `now`
+    uint256 constant startTime = 604411200; // Used to avoid issues with `block.timestamp`
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
@@ -76,13 +76,13 @@ contract ClipperTest is DSTest {
         hevm.warp(startTime);
         calc.file(bytes32("step"), step);
         calc.file(bytes32("cut"),  cut);
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, top);
 
         for(uint256 i = 1; i < testTime; i += 1) {
             hevm.warp(startTime + i);
             lastPrice = price;
-            price = calc.price(top, now - tic);
+            price = calc.price(top, block.timestamp - tic);
             // Stairstep calculation
             if (i % step == 0) { testPrice = lastPrice * percentDecrease / RAY; }
             else               { testPrice = lastPrice; }
@@ -92,7 +92,7 @@ contract ClipperTest is DSTest {
 
     function test_stairstep_exp_decrease() public {
         StairstepExponentialDecrease calc = new StairstepExponentialDecrease();
-        uint256 tic = now; // Start of auction
+        uint256 tic = block.timestamp; // Start of auction
         uint256 percentDecrease;
         uint256 step;
         uint256 testTime = 10 minutes;
@@ -183,48 +183,48 @@ contract ClipperTest is DSTest {
         calc.file(bytes32("tau"), 3600);
 
         uint256 top = 1000 * RAY;
-        uint256 tic = now; // Start of auction
-        uint256 price = calc.price(top, now - tic);
+        uint256 tic = block.timestamp; // Start of auction
+        uint256 price = calc.price(top, block.timestamp - tic);
         assertEq(price, top);
 
         hevm.warp(startTime + 360);                // 6min in,   1/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100) * RAY);
 
         hevm.warp(startTime + 360 * 2);            // 12min in,  2/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 2) * RAY);
 
         hevm.warp(startTime + 360 * 3);            // 18min in,  3/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 3) * RAY);
 
         hevm.warp(startTime + 360 * 4);            // 24min in,  4/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 4) * RAY);
 
         hevm.warp(startTime + 360 * 5);            // 30min in,  5/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 5) * RAY);
 
         hevm.warp(startTime + 360 * 6);            // 36min in,  6/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 6) * RAY);
 
         hevm.warp(startTime + 360 * 7);            // 42min in,  7/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 7) * RAY);
 
         hevm.warp(startTime + 360 * 8);            // 48min in,  8/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 8) * RAY);
 
         hevm.warp(startTime + 360 * 9);            // 54min in,  9/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, (1000 - 100 * 9) * RAY);
 
         hevm.warp(startTime + 360 * 10);           // 60min in, 10/10 done
-        price = calc.price(top, now - tic);
+        price = calc.price(top, block.timestamp - tic);
         assertEq(price, 0);
     }
 }

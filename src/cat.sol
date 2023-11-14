@@ -86,7 +86,7 @@ contract Cat {
     );
 
     // --- Init ---
-    constructor(address vat_) public {
+    constructor(address vat_) {
         wards[msg.sender] = 1;
         vat = VatLike(vat_);
         live = 1;

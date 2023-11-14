@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import { DSTest } from "ds-test/test.sol";
 import { Vat } from "../src/vat.sol";
@@ -233,7 +233,7 @@ contract DogTest is DSTest {
         uint256 DUST_2 = 1500;
         vat.file(ilk, "dust", DUST_2 * RAD);
 
-        // The testing vault is now dusty
+        // The testing vault is block.timestamp dusty
         assertTrue(isDusty());
 
         // In fact, there is only room to create dusty auctions at this point.

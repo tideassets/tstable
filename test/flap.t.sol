@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.20;
 
 import "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
@@ -31,7 +31,7 @@ interface Hevm {
 
 contract Guy {
     Flapper flap;
-    constructor(Flapper flap_) public {
+    constructor(Flapper flap_) {
         flap = flap_;
         Vat(address(flap.vat())).hope(address(flap));
         DSToken(address(flap.gem())).approve(address(flap));
@@ -128,7 +128,7 @@ contract FlapTest is DSTest {
         // excess remains in auction
         assertEq(gem.balanceOf(address(flap)),   2 ether);
 
-        hevm.warp(now + 5 weeks);
+        hevm.warp(block.timestamp + 5 weeks);
         Guy(bob).deal(id);
         // high bidder gets the lot
         assertEq(vat.dai(address(flap)),  0 ether);
@@ -163,7 +163,7 @@ contract FlapTest is DSTest {
         // check no tick
         assertTrue(!Guy(ali).try_tick(id));
         // run past the end
-        hevm.warp(now + 2 weeks);
+        hevm.warp(block.timestamp + 2 weeks);
         // check not biddable
         assertTrue(!Guy(ali).try_tend(id, 100 ether, 1 ether));
         assertTrue( Guy(ali).try_tick(id));

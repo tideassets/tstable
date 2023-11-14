@@ -14,7 +14,7 @@ interface Hevm {
 
 contract Guy {
     Flipper flip;
-    constructor(Flipper flip_) public {
+    constructor(Flipper flip_) {
         flip = flip_;
     }
     function hope(address usr) public {
@@ -68,7 +68,7 @@ contract Cat_ is Cat {
     uint256 constant public RAD = 10 ** 45;
     uint256 constant public MLN = 10 **  6;
 
-    constructor(address vat_) Cat(vat_) public {
+    constructor(address vat_) Cat(vat_) {
         litter = 5 * MLN * RAD;
     }
 }
@@ -167,7 +167,7 @@ contract FlipTest is DSTest {
         // gal receives excess
         assertEq(vat.dai_balance(gal),   2 ether);
 
-        hevm.warp(now + 5 hours);
+        hevm.warp(block.timestamp + 5 hours);
         Guy(bob).deal(id);
         // bob gets the winnings
         assertEq(vat.gem_balance(bob), 100 ether);
@@ -179,7 +179,7 @@ contract FlipTest is DSTest {
                             , gal: gal
                             , bid: 0
                             });
-        hevm.warp(now + 5 hours);
+        hevm.warp(block.timestamp + 5 hours);
 
         Guy(ali).tend(id, 100 ether, 1 ether);
         // bid taken from bidder
@@ -250,7 +250,7 @@ contract FlipTest is DSTest {
         // only after ttl
         Guy(ali).tend(id, 100 ether, 1 ether);
         assertTrue(!Guy(bob).try_deal(id));
-        hevm.warp(now + 4.1 hours);
+        hevm.warp(block.timestamp + 4.1 hours);
         assertTrue( Guy(bob).try_deal(id));
 
         uint ie = flip.kick({ lot: 100 ether
@@ -261,10 +261,10 @@ contract FlipTest is DSTest {
                             });
 
         // or after end
-        hevm.warp(now + 44 hours);
+        hevm.warp(block.timestamp + 44 hours);
         Guy(ali).tend(ie, 100 ether, 1 ether);
         assertTrue(!Guy(bob).try_deal(ie));
-        hevm.warp(now + 1 days);
+        hevm.warp(block.timestamp + 1 days);
         assertTrue( Guy(bob).try_deal(ie));
     }
     function test_tick() public {
@@ -278,7 +278,7 @@ contract FlipTest is DSTest {
         // check no tick
         assertTrue(!Guy(ali).try_tick(id));
         // run past the end
-        hevm.warp(now + 2 weeks);
+        hevm.warp(block.timestamp + 2 weeks);
         // check not biddable
         assertTrue(!Guy(ali).try_tend(id, 100 ether, 1 ether));
         assertTrue( Guy(ali).try_tick(id));
@@ -295,7 +295,7 @@ contract FlipTest is DSTest {
                             , bid: 0
                             });
         assertTrue(!Guy(ali).try_deal(id));
-        hevm.warp(now + 2 weeks);
+        hevm.warp(block.timestamp + 2 weeks);
         assertTrue(!Guy(ali).try_deal(id));
         assertTrue( Guy(ali).try_tick(id));
         assertTrue(!Guy(ali).try_deal(id));
