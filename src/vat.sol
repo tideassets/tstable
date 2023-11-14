@@ -72,14 +72,18 @@ contract Vat {
 
     // --- Math ---
     function _add(uint x, int y) internal pure returns (uint z) {
-        z = x + uint(y);
-        require(y >= 0 || z <= x);
-        require(y <= 0 || z >= x);
+        if (y < 0) {
+            require((z = x - uint(-y)) < x);
+        } else {
+            require((z = x + uint(y)) >= x);    
+        }
     }
     function _sub(uint x, int y) internal pure returns (uint z) {
-        z = x - uint(y);
-        require(y <= 0 || z <= x);
-        require(y >= 0 || z >= x);
+        if (y < 0) {
+            require((z = x + uint(-y)) > x);
+        } else {
+            require((z = x - uint(y)) <= x);    
+        }   
     }
     function _mul(uint x, int y) internal pure returns (int z) {
         z = int(x) * y;
