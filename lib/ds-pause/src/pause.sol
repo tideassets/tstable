@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.8.20
+pragma solidity >=0.6.12;
 
 import {DSNote} from "ds-note/note.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
@@ -24,11 +24,11 @@ contract DSPause is DSAuth, DSNote {
 
     modifier wait { require(msg.sender == address(proxy), "ds-pause-undelayed-call"); _; }
 
-    function setOwner(address owner_) public wait {
+    function setOwner(address owner_) public override wait {
         owner = owner_;
         emit LogSetOwner(owner);
     }
-    function setAuthority(DSAuthority authority_) public wait {
+    function setAuthority(DSAuthority authority_) public override wait {
         authority = authority_;
         emit LogSetAuthority(address(authority));
     }
@@ -79,7 +79,7 @@ contract DSPause is DSAuth, DSNote {
     function plot(address usr, bytes32 tag, bytes memory fax, uint eta)
         public note auth
     {
-        require(eta >= add(now, delay), "ds-pause-delay-not-respected");
+        require(eta >= add(block.timestamp, delay), "ds-pause-delay-not-respected");
         plans[hash(usr, tag, fax, eta)] = true;
     }
 
@@ -95,7 +95,7 @@ contract DSPause is DSAuth, DSNote {
     {
         require(plans[hash(usr, tag, fax, eta)], "ds-pause-unplotted-plan");
         require(soul(usr) == tag,                "ds-pause-wrong-codehash");
-        require(now >= eta,                      "ds-pause-premature-exec");
+        require(block.timestamp >= eta,                      "ds-pause-premature-exec");
 
         plans[hash(usr, tag, fax, eta)] = false;
 
@@ -109,7 +109,7 @@ contract DSPause is DSAuth, DSNote {
 contract DSPauseProxy {
     address public owner;
     modifier auth { require(msg.sender == owner, "ds-pause-proxy-unauthorized"); _; }
-    constructor() public { owner = msg.sender; }
+    constructor() { owner = msg.sender; }
 
     function exec(address usr, bytes memory fax)
         public auth

@@ -188,7 +188,7 @@ contract ESMFab {
 
 contract PauseFab {
     function newPause(uint delay, address owner, address authority) public returns(DSPause pause) {
-        pause = new DSPause(delay, owner, authority);
+        pause = new DSPause(delay, owner, (DSAuthority)(authority));
     }
 }
 
