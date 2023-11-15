@@ -19,8 +19,8 @@
 
 pragma solidity >=0.8.20;
 
-import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSPause} from "ds-pause/pause.sol";
+import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 
 import {Vat} from "../src/vat.sol";
 import {Jug} from "../src/jug.sol";

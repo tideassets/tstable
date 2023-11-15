@@ -18,7 +18,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-pragma solidity >=0.5.12;
+pragma solidity >=0.8.20;
 
 interface SetterLike {
     function file(bytes32, address) external;
