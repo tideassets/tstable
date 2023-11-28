@@ -17,13 +17,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 pragma solidity >=0.8.20;
 
 interface SetterLike {
     function file(bytes32, address) external;
-    function file(bytes32, uint) external;
-    function file(bytes32, bytes32, uint) external;
+    function file(bytes32, uint256) external;
+    function file(bytes32, bytes32, uint256) external;
     function file(bytes32, bytes32, address) external;
     function rely(address) external;
     function deny(address) external;
@@ -39,7 +38,7 @@ interface EndLike {
 
 interface PauseLike {
     function setAuthority(address) external;
-    function setDelay(uint) external;
+    function setDelay(uint256) external;
 }
 
 contract GovActions {
@@ -47,11 +46,11 @@ contract GovActions {
         SetterLike(who).file(what, data);
     }
 
-    function file(address who, bytes32 what, uint data) public {
+    function file(address who, bytes32 what, uint256 data) public {
         SetterLike(who).file(what, data);
     }
 
-    function file(address who, bytes32 ilk, bytes32 what, uint data) public {
+    function file(address who, bytes32 ilk, bytes32 what, uint256 data) public {
         SetterLike(who).file(ilk, what, data);
     }
 
@@ -59,12 +58,12 @@ contract GovActions {
         SetterLike(who).file(ilk, what, data);
     }
 
-    function dripAndFile(address who, bytes32 what, uint data) public {
+    function dripAndFile(address who, bytes32 what, uint256 data) public {
         SetterLike(who).drip();
         SetterLike(who).file(what, data);
     }
 
-    function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) public {
+    function dripAndFile(address who, bytes32 ilk, bytes32 what, uint256 data) public {
         SetterLike(who).drip(ilk);
         SetterLike(who).file(ilk, what, data);
     }
@@ -89,11 +88,11 @@ contract GovActions {
         PauseLike(pause).setAuthority(newAuthority);
     }
 
-    function setDelay(address pause, uint newDelay) public {
+    function setDelay(address pause, uint256 newDelay) public {
         PauseLike(pause).setDelay(newDelay);
     }
 
-    function setAuthorityAndDelay(address pause, address newAuthority, uint newDelay) public {
+    function setAuthorityAndDelay(address pause, address newAuthority, uint256 newDelay) public {
         PauseLike(pause).setAuthority(newAuthority);
         PauseLike(pause).setDelay(newDelay);
     }

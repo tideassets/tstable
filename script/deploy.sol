@@ -32,9 +32,7 @@ import {Flapper} from "../src/flap.sol";
 import {Flopper} from "../src/flop.sol";
 import {Flipper} from "../src/flip.sol";
 import {Clipper} from "../src/clip.sol";
-import {LinearDecrease,
-        StairstepExponentialDecrease,
-        ExponentialDecrease} from "../src/abaci.sol";
+import {LinearDecrease, StairstepExponentialDecrease, ExponentialDecrease} from "../src/abaci.sol";
 import {Dai} from "../src/dai.sol";
 import {Cure} from "../src/cure.sol";
 import {End} from "../src/end.sol";
@@ -83,7 +81,7 @@ contract DogFab {
 }
 
 contract DaiFab {
-    function newDai(address owner, uint chainId) public returns (Dai dai) {
+    function newDai(address owner, uint256 chainId) public returns (Dai dai) {
         dai = new Dai(chainId);
         dai.rely(owner);
         dai.deny(address(this));
@@ -121,7 +119,10 @@ contract FlipFab {
 }
 
 contract ClipFab {
-    function newClip(address owner, address vat, address spotter, address dog, bytes32 ilk) public returns (Clipper clip) {
+    function newClip(address owner, address vat, address spotter, address dog, bytes32 ilk)
+        public
+        returns (Clipper clip)
+    {
         clip = new Clipper(vat, spotter, dog, ilk);
         clip.rely(owner);
         clip.deny(address(this));
@@ -181,51 +182,51 @@ contract EndFab {
 }
 
 contract ESMFab {
-    function newESM(address gov, address end, address proxy, uint min) public returns (ESM esm) {
+    function newESM(address gov, address end, address proxy, uint256 min) public returns (ESM esm) {
         esm = new ESM(gov, end, proxy, min);
     }
 }
 
 contract PauseFab {
-    function newPause(uint delay, address owner, address authority) public returns(DSPause pause) {
+    function newPause(uint256 delay, address owner, address authority) public returns (DSPause pause) {
         pause = new DSPause(delay, owner, (DSAuthority)(authority));
     }
 }
 
 contract DssDeploy is DSAuth {
-    VatFab     public vatFab;
-    JugFab     public jugFab;
-    VowFab     public vowFab;
-    CatFab     public catFab;
-    DogFab     public dogFab;
-    DaiFab     public daiFab;
+    VatFab public vatFab;
+    JugFab public jugFab;
+    VowFab public vowFab;
+    CatFab public catFab;
+    DogFab public dogFab;
+    DaiFab public daiFab;
     DaiJoinFab public daiJoinFab;
-    FlapFab    public flapFab;
-    FlopFab    public flopFab;
-    FlipFab    public flipFab;
-    ClipFab    public clipFab;
-    CalcFab    public calcFab;
-    SpotFab    public spotFab;
-    PotFab     public potFab;
-    CureFab    public cureFab;
-    EndFab     public endFab;
-    ESMFab     public esmFab;
-    PauseFab   public pauseFab;
+    FlapFab public flapFab;
+    FlopFab public flopFab;
+    FlipFab public flipFab;
+    ClipFab public clipFab;
+    CalcFab public calcFab;
+    SpotFab public spotFab;
+    PotFab public potFab;
+    CureFab public cureFab;
+    EndFab public endFab;
+    ESMFab public esmFab;
+    PauseFab public pauseFab;
 
-    Vat     public vat;
-    Jug     public jug;
-    Vow     public vow;
-    Cat     public cat;
-    Dog     public dog;
-    Dai     public dai;
+    Vat public vat;
+    Jug public jug;
+    Vow public vow;
+    Cat public cat;
+    Dog public dog;
+    Dai public dai;
     DaiJoin public daiJoin;
     Flapper public flap;
     Flopper public flop;
     Spotter public spotter;
-    Pot     public pot;
-    Cure    public cure;
-    End     public end;
-    ESM     public esm;
+    Pot public pot;
+    Cure public cure;
+    End public end;
+    ESM public esm;
     DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -286,7 +287,7 @@ contract DssDeploy is DSAuth {
         pauseFab = pauseFab_;
     }
 
-    function rad(uint wad) internal pure returns (uint) {
+    function rad(uint256 wad) internal pure returns (uint256) {
         return wad * 10 ** 27;
     }
 
@@ -385,7 +386,7 @@ contract DssDeploy is DSAuth {
         cure.rely(address(end));
     }
 
-    function deployPause(uint delay, address authority) public auth {
+    function deployPause(uint256 delay, address authority) public auth {
         require(address(dai) != address(0), "Missing previous step");
         require(address(end) != address(0), "Missing previous step");
 

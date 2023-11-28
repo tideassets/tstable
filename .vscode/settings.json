@@ -1,3 +1,8 @@
 {
-  "commentTranslate.source": "Bing"
+  "commentTranslate.source": "Bing",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "go.formatTool": "gofmt",
+  "solidity.formatter": "forge"
 }
