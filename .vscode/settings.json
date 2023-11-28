@@ -4,5 +4,6 @@
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "go.formatTool": "gofmt",
-  "solidity.formatter": "forge"
+  "solidity.formatter": "forge",
+  "editor.tabSize": 2
 }

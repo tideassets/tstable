@@ -22,98 +22,98 @@
 pragma solidity ^0.8.20;
 
 interface VatLike {
-    function dai(address) external view returns (uint256);
-    function ilks(bytes32 ilk)
-        external
-        returns (
-            uint256 Art, // [wad]
-            uint256 rate, // [ray]
-            uint256 spot, // [ray]
-            uint256 line, // [rad]
-            uint256 dust
-        ); // [rad]
+  function dai(address) external view returns (uint);
+  function ilks(bytes32 ilk)
+    external
+    returns (
+      uint Art, // [wad]
+      uint rate, // [ray]
+      uint spot, // [ray]
+      uint line, // [rad]
+      uint dust
+    ); // [rad]
 
-    function urns(bytes32 ilk, address urn)
-        external
-        returns (
-            uint256 ink, // [wad]
-            uint256 art
-        ); // [wad]
+  function urns(bytes32 ilk, address urn)
+    external
+    returns (
+      uint ink, // [wad]
+      uint art
+    ); // [wad]
 
-    function debt() external returns (uint256);
-    function move(address src, address dst, uint256 rad) external;
-    function hope(address) external;
-    function flux(bytes32 ilk, address src, address dst, uint256 rad) external;
-    function grab(bytes32 i, address u, address v, address w, int256 dink, int256 dart) external;
-    function suck(address u, address v, uint256 rad) external;
-    function cage() external;
+  function debt() external returns (uint);
+  function move(address src, address dst, uint rad) external;
+  function hope(address) external;
+  function flux(bytes32 ilk, address src, address dst, uint rad) external;
+  function grab(bytes32 i, address u, address v, address w, int dink, int dart) external;
+  function suck(address u, address v, uint rad) external;
+  function cage() external;
 }
 
 interface CatLike {
-    function ilks(bytes32)
-        external
-        returns (
-            address flip,
-            uint256 chop, // [ray]
-            uint256 lump
-        ); // [rad]
+  function ilks(bytes32)
+    external
+    returns (
+      address flip,
+      uint chop, // [ray]
+      uint lump
+    ); // [rad]
 
-    function cage() external;
+  function cage() external;
 }
 
 interface DogLike {
-    function ilks(bytes32) external returns (address clip, uint256 chop, uint256 hole, uint256 dirt);
-    function cage() external;
+  function ilks(bytes32) external returns (address clip, uint chop, uint hole, uint dirt);
+  function cage() external;
 }
 
 interface PotLike {
-    function cage() external;
+  function cage() external;
 }
 
 interface VowLike {
-    function cage() external;
+  function cage() external;
 }
 
 interface FlipLike {
-    function bids(uint256 id)
-        external
-        view
-        returns (
-            uint256 bid, // [rad]
-            uint256 lot, // [wad]
-            address guy,
-            uint48 tic, // [unix epoch time]
-            uint48 end, // [unix epoch time]
-            address usr,
-            address gal,
-            uint256 tab
-        ); // [rad]
+  function bids(uint id)
+    external
+    view
+    returns (
+      uint bid, // [rad]
+      uint lot, // [wad]
+      address guy,
+      uint48 tic, // [unix epoch time]
+      uint48 end, // [unix epoch time]
+      address usr,
+      address gal,
+      uint tab
+    ); // [rad]
 
-    function yank(uint256 id) external;
+  function yank(uint id) external;
 }
 
 interface ClipLike {
-    function sales(uint256 id)
-        external
-        view
-        returns (uint256 pos, uint256 tab, uint256 lot, address usr, uint96 tic, uint256 top);
-    function yank(uint256 id) external;
+  function sales(uint id)
+    external
+    view
+    returns (uint pos, uint tab, uint lot, address usr, uint96 tic, uint top);
+  function yank(uint id) external;
 }
 
 interface PipLike {
-    function read() external view returns (bytes32);
+  function read() external view returns (bytes32);
 }
 
 interface SpotLike {
-    function par() external view returns (uint256);
-    function ilks(bytes32) external view returns (PipLike pip, uint256 mat); // [ray]
+  function par() external view returns (uint);
+  function ilks(bytes32) external view returns (PipLike pip, uint mat); // [ray]
 
-    function cage() external;
+  function cage() external;
 }
 
 interface CureLike {
-    function tell() external view returns (uint256);
-    function cage() external;
+  function tell() external view returns (uint);
+  function cage() external;
 }
 
 /*
@@ -232,238 +232,242 @@ interface CureLike {
 */
 
 contract End {
-    // --- Auth ---
-    mapping(address => uint256) public wards;
+  // --- Auth ---
+  mapping(address => uint) public wards;
 
-    function rely(address usr) external auth {
-        wards[usr] = 1;
-        emit Rely(usr);
-    }
+  function rely(address usr) external auth {
+    wards[usr] = 1;
+    emit Rely(usr);
+  }
 
-    function deny(address usr) external auth {
-        wards[usr] = 0;
-        emit Deny(usr);
-    }
+  function deny(address usr) external auth {
+    wards[usr] = 0;
+    emit Deny(usr);
+  }
 
-    modifier auth() {
-        require(wards[msg.sender] == 1, "End/not-authorized");
-        _;
-    }
+  modifier auth() {
+    require(wards[msg.sender] == 1, "End/not-authorized");
+    _;
+  }
 
-    // --- Data ---
-    VatLike public vat; // CDP Engine
-    CatLike public cat;
-    DogLike public dog;
-    VowLike public vow; // Debt Engine
-    PotLike public pot;
-    SpotLike public spot;
-    CureLike public cure;
+  // --- Data ---
+  VatLike public vat; // CDP Engine
+  CatLike public cat;
+  DogLike public dog;
+  VowLike public vow; // Debt Engine
+  PotLike public pot;
+  SpotLike public spot;
+  CureLike public cure;
 
-    uint256 public live; // Active Flag
-    uint256 public when; // Time of cage                   [unix epoch time]
-    uint256 public wait; // Processing Cooldown Length             [seconds]
-    uint256 public debt; // Total outstanding dai following processing [rad]
+  uint public live; // Active Flag
+  uint public when; // Time of cage                   [unix epoch time]
+  uint public wait; // Processing Cooldown Length             [seconds]
+  uint public debt; // Total outstanding dai following processing [rad]
 
-    mapping(bytes32 => uint256) public tag; // Cage price              [ray]
-    mapping(bytes32 => uint256) public gap; // Collateral shortfall    [wad]
-    mapping(bytes32 => uint256) public Art; // Total debt per ilk      [wad]
-    mapping(bytes32 => uint256) public fix; // Final cash price        [ray]
+  mapping(bytes32 => uint) public tag; // Cage price              [ray]
+  mapping(bytes32 => uint) public gap; // Collateral shortfall    [wad]
+  mapping(bytes32 => uint) public Art; // Total debt per ilk      [wad]
+  mapping(bytes32 => uint) public fix; // Final cash price        [ray]
 
-    mapping(address => uint256) public bag; //    [wad]
-    mapping(bytes32 => mapping(address => uint256)) public out; //    [wad]
+  mapping(address => uint) public bag; //    [wad]
+  mapping(bytes32 => mapping(address => uint)) public out; //    [wad]
 
-    // --- Events ---
-    event Rely(address indexed usr);
-    event Deny(address indexed usr);
+  // --- Events ---
+  event Rely(address indexed usr);
+  event Deny(address indexed usr);
 
-    event File(bytes32 indexed what, uint256 data);
-    event File(bytes32 indexed what, address data);
+  event File(bytes32 indexed what, uint data);
+  event File(bytes32 indexed what, address data);
 
-    event Cage();
-    event Cage(bytes32 indexed ilk);
-    event Snip(bytes32 indexed ilk, uint256 indexed id, address indexed usr, uint256 tab, uint256 lot, uint256 art);
-    event Skip(bytes32 indexed ilk, uint256 indexed id, address indexed usr, uint256 tab, uint256 lot, uint256 art);
-    event Skim(bytes32 indexed ilk, address indexed urn, uint256 wad, uint256 art);
-    event Free(bytes32 indexed ilk, address indexed usr, uint256 ink);
-    event Thaw();
-    event Flow(bytes32 indexed ilk);
-    event Pack(address indexed usr, uint256 wad);
-    event Cash(bytes32 indexed ilk, address indexed usr, uint256 wad);
+  event Cage();
+  event Cage(bytes32 indexed ilk);
+  event Snip(
+    bytes32 indexed ilk, uint indexed id, address indexed usr, uint tab, uint lot, uint art
+  );
+  event Skip(
+    bytes32 indexed ilk, uint indexed id, address indexed usr, uint tab, uint lot, uint art
+  );
+  event Skim(bytes32 indexed ilk, address indexed urn, uint wad, uint art);
+  event Free(bytes32 indexed ilk, address indexed usr, uint ink);
+  event Thaw();
+  event Flow(bytes32 indexed ilk);
+  event Pack(address indexed usr, uint wad);
+  event Cash(bytes32 indexed ilk, address indexed usr, uint wad);
 
-    // --- Init ---
-    constructor() {
-        wards[msg.sender] = 1;
-        live = 1;
-        emit Rely(msg.sender);
-    }
+  // --- Init ---
+  constructor() {
+    wards[msg.sender] = 1;
+    live = 1;
+    emit Rely(msg.sender);
+  }
 
-    // --- Math ---
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
+  // --- Math ---
+  uint constant WAD = 10 ** 18;
+  uint constant RAY = 10 ** 27;
 
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x + y;
-        require(z >= x);
-    }
+  function add(uint x, uint y) internal pure returns (uint z) {
+    z = x + y;
+    require(z >= x);
+  }
 
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x - y) <= x);
-    }
+  function sub(uint x, uint y) internal pure returns (uint z) {
+    require((z = x - y) <= x);
+  }
 
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y == 0 || (z = x * y) / y == x);
-    }
+  function mul(uint x, uint y) internal pure returns (uint z) {
+    require(y == 0 || (z = x * y) / y == x);
+  }
 
-    function min(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        return x <= y ? x : y;
-    }
+  function min(uint x, uint y) internal pure returns (uint z) {
+    return x <= y ? x : y;
+  }
 
-    function rmul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = mul(x, y) / RAY;
-    }
+  function rmul(uint x, uint y) internal pure returns (uint z) {
+    z = mul(x, y) / RAY;
+  }
 
-    function wdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = mul(x, WAD) / y;
-    }
+  function wdiv(uint x, uint y) internal pure returns (uint z) {
+    z = mul(x, WAD) / y;
+  }
 
-    // --- Administration ---
-    function file(bytes32 what, address data) external auth {
-        require(live == 1, "End/not-live");
-        if (what == "vat") vat = VatLike(data);
-        else if (what == "cat") cat = CatLike(data);
-        else if (what == "dog") dog = DogLike(data);
-        else if (what == "vow") vow = VowLike(data);
-        else if (what == "pot") pot = PotLike(data);
-        else if (what == "spot") spot = SpotLike(data);
-        else if (what == "cure") cure = CureLike(data);
-        else revert("End/file-unrecognized-param");
-        emit File(what, data);
-    }
+  // --- Administration ---
+  function file(bytes32 what, address data) external auth {
+    require(live == 1, "End/not-live");
+    if (what == "vat") vat = VatLike(data);
+    else if (what == "cat") cat = CatLike(data);
+    else if (what == "dog") dog = DogLike(data);
+    else if (what == "vow") vow = VowLike(data);
+    else if (what == "pot") pot = PotLike(data);
+    else if (what == "spot") spot = SpotLike(data);
+    else if (what == "cure") cure = CureLike(data);
+    else revert("End/file-unrecognized-param");
+    emit File(what, data);
+  }
 
-    function file(bytes32 what, uint256 data) external auth {
-        require(live == 1, "End/not-live");
-        if (what == "wait") wait = data;
-        else revert("End/file-unrecognized-param");
-        emit File(what, data);
-    }
+  function file(bytes32 what, uint data) external auth {
+    require(live == 1, "End/not-live");
+    if (what == "wait") wait = data;
+    else revert("End/file-unrecognized-param");
+    emit File(what, data);
+  }
 
-    // --- Settlement ---
-    function cage() external auth {
-        require(live == 1, "End/not-live");
-        live = 0;
-        when = block.timestamp;
-        vat.cage();
-        cat.cage();
-        dog.cage();
-        vow.cage();
-        spot.cage();
-        pot.cage();
-        cure.cage();
-        emit Cage();
-    }
+  // --- Settlement ---
+  function cage() external auth {
+    require(live == 1, "End/not-live");
+    live = 0;
+    when = block.timestamp;
+    vat.cage();
+    cat.cage();
+    dog.cage();
+    vow.cage();
+    spot.cage();
+    pot.cage();
+    cure.cage();
+    emit Cage();
+  }
 
-    function cage(bytes32 ilk) external {
-        require(live == 0, "End/still-live");
-        require(tag[ilk] == 0, "End/tag-ilk-already-defined");
-        (Art[ilk],,,,) = vat.ilks(ilk);
-        (PipLike pip,) = spot.ilks(ilk);
-        // par is a ray, pip returns a wad
-        tag[ilk] = wdiv(spot.par(), uint256(pip.read()));
-        emit Cage(ilk);
-    }
+  function cage(bytes32 ilk) external {
+    require(live == 0, "End/still-live");
+    require(tag[ilk] == 0, "End/tag-ilk-already-defined");
+    (Art[ilk],,,,) = vat.ilks(ilk);
+    (PipLike pip,) = spot.ilks(ilk);
+    // par is a ray, pip returns a wad
+    tag[ilk] = wdiv(spot.par(), uint(pip.read()));
+    emit Cage(ilk);
+  }
 
-    function snip(bytes32 ilk, uint256 id) external {
-        require(tag[ilk] != 0, "End/tag-ilk-not-defined");
+  function snip(bytes32 ilk, uint id) external {
+    require(tag[ilk] != 0, "End/tag-ilk-not-defined");
 
-        (address _clip,,,) = dog.ilks(ilk);
-        ClipLike clip = ClipLike(_clip);
-        (, uint256 rate,,,) = vat.ilks(ilk);
-        (, uint256 tab, uint256 lot, address usr,,) = clip.sales(id);
+    (address _clip,,,) = dog.ilks(ilk);
+    ClipLike clip = ClipLike(_clip);
+    (, uint rate,,,) = vat.ilks(ilk);
+    (, uint tab, uint lot, address usr,,) = clip.sales(id);
 
-        vat.suck(address(vow), address(vow), tab);
-        clip.yank(id);
+    vat.suck(address(vow), address(vow), tab);
+    clip.yank(id);
 
-        uint256 art = tab / rate;
-        Art[ilk] = add(Art[ilk], art);
-        require(int256(lot) >= 0 && int256(art) >= 0, "End/overflow");
-        vat.grab(ilk, usr, address(this), address(vow), int256(lot), int256(art));
-        emit Snip(ilk, id, usr, tab, lot, art);
-    }
+    uint art = tab / rate;
+    Art[ilk] = add(Art[ilk], art);
+    require(int(lot) >= 0 && int(art) >= 0, "End/overflow");
+    vat.grab(ilk, usr, address(this), address(vow), int(lot), int(art));
+    emit Snip(ilk, id, usr, tab, lot, art);
+  }
 
-    function skip(bytes32 ilk, uint256 id) external {
-        require(tag[ilk] != 0, "End/tag-ilk-not-defined");
+  function skip(bytes32 ilk, uint id) external {
+    require(tag[ilk] != 0, "End/tag-ilk-not-defined");
 
-        (address _flip,,) = cat.ilks(ilk);
-        FlipLike flip = FlipLike(_flip);
-        (, uint256 rate,,,) = vat.ilks(ilk);
-        (uint256 bid, uint256 lot,,,, address usr,, uint256 tab) = flip.bids(id);
+    (address _flip,,) = cat.ilks(ilk);
+    FlipLike flip = FlipLike(_flip);
+    (, uint rate,,,) = vat.ilks(ilk);
+    (uint bid, uint lot,,,, address usr,, uint tab) = flip.bids(id);
 
-        vat.suck(address(vow), address(vow), tab);
-        vat.suck(address(vow), address(this), bid);
-        vat.hope(address(flip));
-        flip.yank(id);
+    vat.suck(address(vow), address(vow), tab);
+    vat.suck(address(vow), address(this), bid);
+    vat.hope(address(flip));
+    flip.yank(id);
 
-        uint256 art = tab / rate;
-        Art[ilk] = add(Art[ilk], art);
-        require(int256(lot) >= 0 && int256(art) >= 0, "End/overflow");
-        vat.grab(ilk, usr, address(this), address(vow), int256(lot), int256(art));
-        emit Skip(ilk, id, usr, tab, lot, art);
-    }
+    uint art = tab / rate;
+    Art[ilk] = add(Art[ilk], art);
+    require(int(lot) >= 0 && int(art) >= 0, "End/overflow");
+    vat.grab(ilk, usr, address(this), address(vow), int(lot), int(art));
+    emit Skip(ilk, id, usr, tab, lot, art);
+  }
 
-    function skim(bytes32 ilk, address urn) external {
-        require(tag[ilk] != 0, "End/tag-ilk-not-defined");
-        (, uint256 rate,,,) = vat.ilks(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, urn);
+  function skim(bytes32 ilk, address urn) external {
+    require(tag[ilk] != 0, "End/tag-ilk-not-defined");
+    (, uint rate,,,) = vat.ilks(ilk);
+    (uint ink, uint art) = vat.urns(ilk, urn);
 
-        uint256 owe = rmul(rmul(art, rate), tag[ilk]);
-        uint256 wad = min(ink, owe);
-        gap[ilk] = add(gap[ilk], sub(owe, wad));
+    uint owe = rmul(rmul(art, rate), tag[ilk]);
+    uint wad = min(ink, owe);
+    gap[ilk] = add(gap[ilk], sub(owe, wad));
 
-        require(wad <= 2 ** 255 && art <= 2 ** 255, "End/overflow");
-        vat.grab(ilk, urn, address(this), address(vow), -int256(wad), -int256(art));
-        emit Skim(ilk, urn, wad, art);
-    }
+    require(wad <= 2 ** 255 && art <= 2 ** 255, "End/overflow");
+    vat.grab(ilk, urn, address(this), address(vow), -int(wad), -int(art));
+    emit Skim(ilk, urn, wad, art);
+  }
 
-    function free(bytes32 ilk) external {
-        require(live == 0, "End/still-live");
-        (uint256 ink, uint256 art) = vat.urns(ilk, msg.sender);
-        require(art == 0, "End/art-not-zero");
-        require(ink <= 2 ** 255, "End/overflow");
-        vat.grab(ilk, msg.sender, msg.sender, address(vow), -int256(ink), 0);
-        emit Free(ilk, msg.sender, ink);
-    }
+  function free(bytes32 ilk) external {
+    require(live == 0, "End/still-live");
+    (uint ink, uint art) = vat.urns(ilk, msg.sender);
+    require(art == 0, "End/art-not-zero");
+    require(ink <= 2 ** 255, "End/overflow");
+    vat.grab(ilk, msg.sender, msg.sender, address(vow), -int(ink), 0);
+    emit Free(ilk, msg.sender, ink);
+  }
 
-    function thaw() external {
-        require(live == 0, "End/still-live");
-        require(debt == 0, "End/debt-not-zero");
-        require(vat.dai(address(vow)) == 0, "End/surplus-not-zero");
-        require(block.timestamp >= add(when, wait), "End/wait-not-finished");
-        debt = sub(vat.debt(), cure.tell());
-        emit Thaw();
-    }
+  function thaw() external {
+    require(live == 0, "End/still-live");
+    require(debt == 0, "End/debt-not-zero");
+    require(vat.dai(address(vow)) == 0, "End/surplus-not-zero");
+    require(block.timestamp >= add(when, wait), "End/wait-not-finished");
+    debt = sub(vat.debt(), cure.tell());
+    emit Thaw();
+  }
 
-    function flow(bytes32 ilk) external {
-        require(debt != 0, "End/debt-zero");
-        require(fix[ilk] == 0, "End/fix-ilk-already-defined");
+  function flow(bytes32 ilk) external {
+    require(debt != 0, "End/debt-zero");
+    require(fix[ilk] == 0, "End/fix-ilk-already-defined");
 
-        (, uint256 rate,,,) = vat.ilks(ilk);
-        uint256 wad = rmul(rmul(Art[ilk], rate), tag[ilk]);
-        fix[ilk] = mul(sub(wad, gap[ilk]), RAY) / (debt / RAY);
-        emit Flow(ilk);
-    }
+    (, uint rate,,,) = vat.ilks(ilk);
+    uint wad = rmul(rmul(Art[ilk], rate), tag[ilk]);
+    fix[ilk] = mul(sub(wad, gap[ilk]), RAY) / (debt / RAY);
+    emit Flow(ilk);
+  }
 
-    function pack(uint256 wad) external {
-        require(debt != 0, "End/debt-zero");
-        vat.move(msg.sender, address(vow), mul(wad, RAY));
-        bag[msg.sender] = add(bag[msg.sender], wad);
-        emit Pack(msg.sender, wad);
-    }
+  function pack(uint wad) external {
+    require(debt != 0, "End/debt-zero");
+    vat.move(msg.sender, address(vow), mul(wad, RAY));
+    bag[msg.sender] = add(bag[msg.sender], wad);
+    emit Pack(msg.sender, wad);
+  }
 
-    function cash(bytes32 ilk, uint256 wad) external {
-        require(fix[ilk] != 0, "End/fix-ilk-not-defined");
-        vat.flux(ilk, address(this), msg.sender, rmul(wad, fix[ilk]));
-        out[ilk][msg.sender] = add(out[ilk][msg.sender], wad);
-        require(out[ilk][msg.sender] <= bag[msg.sender], "End/insufficient-bag-balance");
-        emit Cash(ilk, msg.sender, wad);
-    }
+  function cash(bytes32 ilk, uint wad) external {
+    require(fix[ilk] != 0, "End/fix-ilk-not-defined");
+    vat.flux(ilk, address(this), msg.sender, rmul(wad, fix[ilk]));
+    out[ilk][msg.sender] = add(out[ilk][msg.sender], wad);
+    require(out[ilk][msg.sender] <= bag[msg.sender], "End/insufficient-bag-balance");
+    emit Cash(ilk, msg.sender, wad);
+  }
 }
