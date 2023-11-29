@@ -336,7 +336,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     require(y == 0 || (z = x * y) / y == x);
   }
 
-  function setUp() public virtual {
+  function _setUp() internal {
     vatFab = new VatFab();
     jugFab = new JugFab();
     vowFab = new VowFab();
@@ -384,6 +384,10 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
     user1 = new FakeUser();
     user2 = new FakeUser();
+  }
+
+  function setUp() public virtual {
+    _setUp();
 
     hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     hevm.warp(0);
@@ -393,7 +397,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     return wad * 10 ** 27;
   }
 
-  function deployKeepAuth() public {
+  function _dssDeploy() internal {
     dssDeploy.deployVat();
     dssDeploy.deployDai(99);
     dssDeploy.deployTaxation();
@@ -421,6 +425,10 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     authority.permit(
       address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
     );
+  }
+
+  function deployKeepAuth() public {
+    _dssDeploy();
 
     weth = new WETH();
     ethJoin = new GemJoin(address(vat), "ETH", address(weth));

@@ -19,7 +19,7 @@
 
 pragma solidity >=0.8.20;
 
-import "./DssDeploy.t.base.sol";
+import "./deploy.t.base.sol";
 
 contract DssDeployTest is DssDeployTestBase {
   function testDeploy() public {
@@ -94,7 +94,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testExitETH() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     ethJoin.exit(address(this), 1 ether);
     assertEq(vat.gem("ETH", address(this)), 0);
@@ -114,7 +114,7 @@ contract DssDeployTest is DssDeployTestBase {
     deploy();
     assertEq(dai.balanceOf(address(this)), 0);
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
@@ -144,7 +144,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFrobDrawDaiLimit() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
   }
@@ -162,7 +162,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailFrobDrawDaiLimit() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether + 1);
   }
@@ -180,13 +180,13 @@ contract DssDeployTest is DssDeployTestBase {
   function testFrobPaybackDai() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
     vat.hope(address(daiJoin));
     daiJoin.exit(address(this), 60 ether);
     assertEq(dai.balanceOf(address(this)), 60 ether);
-    dai.approve(address(daiJoin),type(uint).max);
+    dai.approve(address(daiJoin), type(uint).max);
     daiJoin.join(address(this), 60 ether);
     assertEq(dai.balanceOf(address(this)), 0);
 
@@ -198,7 +198,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFrobFromAnotherUser() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.hope(address(user1));
     user1.doFrob(
@@ -209,7 +209,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailFrobDust() public {
     deploy();
     weth.mint(100 ether); // Big number just to make sure to avoid unsafe situation
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 100 ether);
 
     this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
@@ -219,7 +219,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailFrobFromAnotherUser() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     user1.doFrob(
       address(vat), "ETH", address(this), address(this), address(this), 0.5 ether, 60 ether
@@ -229,7 +229,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailBite() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI
 
@@ -242,7 +242,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(cat), "ETH", "chop", WAD);
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
 
@@ -264,7 +264,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(cat), "ETH", "chop", WAD);
     weth.mint(10 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 10 ether);
     vat.frob("ETH", address(this), address(this), address(this), 10 ether, 2000 ether); // Maximun DAI generated
 
@@ -286,7 +286,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(cat), "ETH", "chop", WAD);
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
     pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
@@ -332,7 +332,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(dog), "COL2", "hole", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(dog), "COL2", "chop", WAD);
     col2.mint(1 ether);
-    col2.approve(address(col2Join),type(uint).max);
+    col2.approve(address(col2Join), type(uint).max);
     col2Join.join(address(this), 1 ether);
     vat.frob("COL2", address(this), address(this), address(this), 1 ether, 20 ether); // Maximun DAI generated
     pipCOL2.poke(bytes32(uint(30 * 10 ** 18 - 1))); // Decrease price in 1 wei
@@ -374,7 +374,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(cat), "ETH", "chop", WAD);
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
     pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
@@ -435,7 +435,7 @@ contract DssDeployTest is DssDeployTestBase {
   function _flap() internal returns (uint batchId) {
     this.dripAndFile(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
     weth.mint(0.5 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 0.5 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
     hevm.warp(block.timestamp + 1);
@@ -481,7 +481,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
     this.file(address(cat), "ETH", "chop", WAD);
     weth.mint(2 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 2 ether);
     vat.frob("ETH", address(this), address(this), address(this), 2 ether, 400 ether); // Maximun DAI generated
     pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
@@ -618,7 +618,7 @@ contract DssDeployTest is DssDeployTestBase {
     this.dripAndFile(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.1 * 10 ** 27));
     this.dripAndFile(address(pot), "dsr", uint(1.05 * 10 ** 27));
     weth.mint(0.5 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 0.5 ether);
     vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
     assertEq(vat.dai(address(this)), mul(10 ether, RAY));
@@ -634,7 +634,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFork() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -657,7 +657,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailFork() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -668,7 +668,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testForkFromOtherUsr() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -680,7 +680,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailForkFromOtherUsr() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -691,7 +691,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailForkUnsafeSrc() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -701,7 +701,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailForkUnsafeDst() public {
     deploy();
     weth.mint(1 ether);
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 1 ether);
 
     vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
@@ -711,7 +711,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailForkDustSrc() public {
     deploy();
     weth.mint(100 ether); // Big number just to make sure to avoid unsafe situation
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 100 ether);
 
     this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
@@ -724,7 +724,7 @@ contract DssDeployTest is DssDeployTestBase {
   function testFailForkDustDst() public {
     deploy();
     weth.mint(100 ether); // Big number just to make sure to avoid unsafe situation
-    weth.approve(address(ethJoin),type(uint).max);
+    weth.approve(address(ethJoin), type(uint).max);
     ethJoin.join(address(this), 100 ether);
 
     this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
