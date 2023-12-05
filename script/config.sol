@@ -17,7 +17,7 @@ abstract contract Config is Script {
     string calcType;
   }
 
-  function convCalc(RawCalc calldata in_) internal pure returns (Calc memory out_) {
+  function convCalc(RawCalc memory in_) public pure returns (Calc memory out_) {
     out_.calcType = in_.calcType;
     out_.cut = vm.parseUint(in_.cut);
     out_.step = vm.parseUint(in_.step);
@@ -48,11 +48,7 @@ abstract contract Config is Script {
     uint cm_tolerance;
   }
 
-  function convClipDeploy(RawClipDeploy calldata in_)
-    internal
-    pure
-    returns (ClipDeploy memory out_)
-  {
+  function convClipDeploy(RawClipDeploy memory in_) public pure returns (ClipDeploy memory out_) {
     out_.buf = vm.parseUint(in_.buf);
     convCalc(in_.calc);
     // out_.chip = vm.parseUint(in_.chip);
@@ -90,7 +86,7 @@ abstract contract Config is Script {
     string name;
   }
 
-  function convIlk(RawIlk calldata in_) internal pure returns (Ilk memory out_) {
+  function convIlk(RawIlk memory in_) public pure returns (Ilk memory out_) {
     out_.autoLine = vm.parseUint(in_.autoLine);
     out_.autoLineGap = vm.parseUint(in_.autoLineGap);
     out_.autoLineTtl = vm.parseUint(in_.autoLineTtl);
@@ -132,7 +128,7 @@ abstract contract Config is Script {
     string name;
   }
 
-  function convToken(RawToken calldata in_) internal pure returns (Token memory out_) {
+  function convToken(RawToken memory in_) public pure returns (Token memory out_) {
     out_.name = in_.name;
     out_.importx = in_.importx;
     out_.joinDeploy = in_.joinDeploy;
@@ -168,7 +164,7 @@ abstract contract Config is Script {
     uint jug_base;
   }
 
-  function convConfig0(RawConfig0 calldata in_) internal pure returns (Config0 memory out_) {
+  function convConfig0(RawConfig0 memory in_) public pure returns (Config0 memory out_) {
     out_.pauseDelay = vm.parseUint(in_.pauseDelay);
     out_.vat_line = vm.parseUint(in_.vat_line);
     out_.vow_wait = vm.parseUint(in_.vow_wait);
@@ -213,7 +209,7 @@ abstract contract Config is Script {
     uint flash_max;
   }
 
-  function convConfig1(RawConfig1 calldata in_) internal pure returns (Config1 memory out_) {
+  function convConfig1(RawConfig1 memory in_) public pure returns (Config1 memory out_) {
     out_.pot_dsr = vm.parseUint(in_.pot_dsr);
     out_.cure_wait = vm.parseUint(in_.cure_wait);
     out_.end_wait = vm.parseUint(in_.end_wait);
@@ -229,12 +225,155 @@ abstract contract Config is Script {
     out_.flash_max = vm.parseUint(in_.flash_max);
   }
 
+  struct RawGlobal {
+    string cat_box;
+    string cure_wait;
+    string description;
+    string dog_hole;
+    string end_wait;
+    string esm_min;
+    string flap_beg;
+    string flap_lid;
+    string flap_tau;
+    string flap_ttl;
+    string flash_max;
+    string flop_beg;
+    string flop_pad;
+    string flop_tau;
+    string flop_ttl;
+    string jug_base;
+    string pauseDelay;
+    string pot_dsr;
+    string vat_line;
+    string vow_bump;
+    string vow_dump;
+    string vow_hump;
+    string vow_sump;
+    string vow_wait;
+  }
+
   struct Global {
+    uint cat_box;
+    uint cure_wait;
+    string description;
+    uint dog_hole;
+    uint end_wait;
+    uint esm_min;
+    uint flap_beg;
+    uint flap_lid;
+    uint flap_tau;
+    uint flap_ttl;
+    uint flash_max;
+    uint flop_beg;
+    uint flop_pad;
+    uint flop_tau;
+    uint flop_ttl;
+    uint jug_base;
+    uint pauseDelay;
+    uint pot_dsr;
+    uint vat_line;
+    uint vow_bump;
+    uint vow_dump;
+    uint vow_hump;
+    uint vow_sump;
+    uint vow_wait;
+  }
+
+  function convGlobal(RawGlobal memory in_) public pure returns (Global memory out_) {
+    out_.cat_box = vm.parseUint(in_.cat_box);
+    out_.cure_wait = vm.parseUint(in_.cure_wait);
+    out_.dog_hole = vm.parseUint(in_.dog_hole);
+    out_.end_wait = vm.parseUint(in_.end_wait);
+    out_.esm_min = vm.parseUint(in_.esm_min);
+    out_.flap_beg = vm.parseUint(in_.flap_beg);
+    out_.flap_lid = vm.parseUint(in_.flap_lid);
+    out_.flap_tau = vm.parseUint(in_.flap_tau);
+    out_.flap_ttl = vm.parseUint(in_.flap_ttl);
+    out_.flash_max = vm.parseUint(in_.flash_max);
+    out_.flop_beg = vm.parseUint(in_.flop_beg);
+    out_.flop_pad = vm.parseUint(in_.flop_pad);
+    out_.flop_tau = vm.parseUint(in_.flop_tau);
+    out_.flop_ttl = vm.parseUint(in_.flop_ttl);
+    out_.jug_base = vm.parseUint(in_.jug_base);
+    out_.pauseDelay = vm.parseUint(in_.pauseDelay);
+    out_.pot_dsr = vm.parseUint(in_.pot_dsr);
+    out_.vat_line = vm.parseUint(in_.vat_line);
+    out_.vow_bump = vm.parseUint(in_.vow_bump);
+    out_.vow_dump = vm.parseUint(in_.vow_dump);
+    out_.vow_hump = vm.parseUint(in_.vow_hump);
+    out_.vow_sump = vm.parseUint(in_.vow_sump);
+    out_.vow_wait = vm.parseUint(in_.vow_wait);
+  }
+
+  /*
+  "import": {
+    "chainlog": "0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F",
+    "gov": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+    "authority": "0x0a3f6849f78076aefaDf113F5BED87720274dDC0",
+    "proxyRegistry": "0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4",
+    "faucet": "0x0000000000000000000000000000000000000000"
+  },
+  */
+
+  struct ImportG {
+    address authority;
+    address chainlog;
+    address faucet;
+    address gov;
+    address proxyRegistry;
+  }
+
+  struct Global_ {
     Config0 config0;
     Config1 config1;
   }
 
-  function initGlobalConfig() internal pure returns (Global memory config) {
+  struct RawG {
+    RawGlobal global;
+    ImportG importx;
+    RawToken[] tokens;
+  }
+
+  struct G {
+    Global global;
+    ImportG importx;
+    Token[] tokens;
+  }
+
+  struct RawG2 {
+    RawConfig0 config0;
+    RawConfig1 config1;
+    ImportG importx;
+    RawToken[] tokens;
+  }
+
+  struct G2 {
+    Config0 config0;
+    Config1 config1;
+    ImportG importx;
+    Token[] tokens;
+  }
+
+  function ConvG2(RawG2 memory in_) public pure returns (G2 memory out_) {
+    out_.config0 = convConfig0(in_.config0);
+    out_.config1 = convConfig1(in_.config1);
+    out_.importx = in_.importx;
+    out_.tokens = new Token[](in_.tokens.length);
+    for (uint i = 0; i < in_.tokens.length; i++) {
+      out_.tokens[i] = convToken(in_.tokens[i]);
+    }
+  }
+
+  function convG(RawG memory in_) public pure returns (G memory out_) {
+    out_.global = convGlobal(in_.global);
+    out_.importx = in_.importx;
+    out_.tokens = new Token[](in_.tokens.length);
+    for (uint i = 0; i < in_.tokens.length; i++) {
+      out_.tokens[i] = convToken(in_.tokens[i]);
+    }
+  }
+
+  function initGlobalConfig() public pure returns (Global_ memory config) {
     uint ONE = 10 ** 18;
     config.config0 = Config0({
       pauseDelay: 0,
@@ -265,31 +404,65 @@ abstract contract Config is Script {
     });
   }
 
-  uint public constant TOKEN_LENGTH = 35;
+  function parseConfig(string memory json) public pure returns (G memory g) {
+    bytes memory jsonBytes = vm.parseJson(json);
+    RawG memory rg = abi.decode(jsonBytes, (RawG));
+    g = convG(rg);
+  }
 
-  function parseTokenConfig() public view returns (Token[] memory tokens) {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+  function parseGlobal(string memory json) public pure returns (Global memory global) {
+    bytes memory jsonBytes = vm.parseJson(json, ".global");
+    RawGlobal memory rglobal = abi.decode(jsonBytes, (RawGlobal));
+    global = convGlobal(rglobal);
+  }
+
+  function parseImport(string memory json) public pure returns (ImportG memory importx) {
+    bytes memory jsonBytes = vm.parseJson(json, ".import");
+    importx = abi.decode(jsonBytes, (ImportG));
+  }
+
+  function parseConfig2(string memory json) public pure returns (RawG2 memory rg) {
+    bytes memory jsonBytes = vm.parseJson(json);
+    rg = abi.decode(jsonBytes, (RawG2));
+  }
+
+  function parseRawTokens(string memory json, uint len)
+    public
+    pure
+    returns (RawToken[] memory tokens)
+  {
+    tokens = new RawToken[](len);
+    for (uint i = 0; i < len; i++) {
+      bytes memory jsonBytes =
+        vm.parseJson(json, string(abi.encodePacked(".tokens[", vm.toString(i), "]")));
+      tokens[i] = abi.decode(jsonBytes, (RawToken));
+    }
+  }
+
+  function parseTokens(string memory json) public pure returns (Token[] memory tokens) {
+    uint TOKEN_LENGTH = 35;
     tokens = new Token[](TOKEN_LENGTH);
     for (uint i = 0; i < TOKEN_LENGTH; i++) {
       bytes memory jsonBytes =
         vm.parseJson(json, string(abi.encodePacked(".tokens[", vm.toString(i), "]")));
-      tokens[i] = abi.decode(jsonBytes, (Token));
+      tokens[i] = convToken(abi.decode(jsonBytes, (RawToken)));
     }
   }
 
-  function parseConfig0() public view returns (RawConfig0 memory config) {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+  function parseConfig0(string memory json) public pure returns (Config0 memory config) {
     bytes memory jsonBytes = vm.parseJson(json, ".config0");
-    config = abi.decode(jsonBytes, (RawConfig0));
+    RawConfig0 memory rconfig = abi.decode(jsonBytes, (RawConfig0));
+    config = convConfig0(rconfig);
   }
 
-  function parseConfig1() public view returns (RawConfig1 memory config) {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+  function parseConfig1(string memory json) public pure returns (Config1 memory config) {
     bytes memory jsonBytes = vm.parseJson(json, ".config1");
-    config = abi.decode(jsonBytes, (RawConfig1));
+    RawConfig1 memory rconfig = abi.decode(jsonBytes, (RawConfig1));
+    config = convConfig1(rconfig);
   }
 }
 
+// string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
 /*
 
 contract TokenList {

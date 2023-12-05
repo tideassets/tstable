@@ -16,7 +16,6 @@ interface IPip is PipLike {
 contract DeploySrcipt is Config, DssDeployTestBase {
   uint constant ONE = 10 ** 18;
 
-
   // function gemJoin() internal {
   //   require(address(vat) != address(0), "vat must deployed before do this");
   //   for (uint i = 0; i < tl.tokenLength(); i++) {
@@ -46,9 +45,11 @@ contract DeploySrcipt is Config, DssDeployTestBase {
   }
 
   function run() public {
-    Global memory config = initGlobalConfig();
-    Token[] memory ts = parseConfig();
-    console2.log("token length: %s", vm.toString(ts.length));
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    G memory g = parseConfig(json);
+    console2.log("g.golbal.vat_line", g.global.vat_line);
+    console2.log("g.import.gov", g.importx.gov);
+    console2.log("g.tokens.length", g.tokens.length);
 
     // deploy the contract
     uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");

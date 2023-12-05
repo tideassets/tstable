@@ -60,7 +60,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -84,7 +84,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -108,7 +108,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -144,7 +144,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -180,7 +180,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -204,7 +204,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -240,7 +240,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -276,7 +276,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -300,33 +300,33 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "60",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
-          },
-          "C": {
-            "mat": "175",
-            "line": "0",
-            "autoLine": "1000000000",
-            "autoLineGap": "100000000",
-            "autoLineTtl": "28800",
-            "dust": "7500",
-            "duty": "1.5",
-            "clipDeploy": {
-              "chop": "13",
-              "hole": "25000000",
-              "chip": "0.1",
-              "tip": "300",
-              "buf": "120",
-              "tail": "5400",
-              "cusp": "40",
-              "calc": {
-                "type": "StairstepExponentialDecrease",
-                "step": "90",
-                "cut":  "99"
-              },
-              "cm_tolerance": "50"
-            }
+          }
+        },
+        "C": {
+          "mat": "175",
+          "line": "0",
+          "autoLine": "1000000000",
+          "autoLineGap": "100000000",
+          "autoLineTtl": "28800",
+          "dust": "7500",
+          "duty": "1.5",
+          "clipDeploy": {
+            "chop": "13",
+            "hole": "25000000",
+            "chip": "0.1",
+            "tip": "300",
+            "buf": "120",
+            "tail": "5400",
+            "cusp": "40",
+            "calc": {
+              "type": "StairstepExponentialDecrease",
+              "step": "90",
+              "cut": "99"
+            },
+            "cm_tolerance": "50"
           }
         }
       }
@@ -360,7 +360,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -396,7 +396,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -432,7 +432,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -468,7 +468,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -504,7 +504,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -540,7 +540,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -576,7 +576,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -612,7 +612,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -648,7 +648,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -684,7 +684,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -720,7 +720,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -756,7 +756,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -792,7 +792,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -828,7 +828,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -864,7 +864,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "125",
-              "cut":  "99.5"
+              "cut": "99.5"
             },
             "cm_tolerance": "70"
           }
@@ -900,7 +900,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "130",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -936,7 +936,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "125",
-              "cut":  "99.5"
+              "cut": "99.5"
             },
             "cm_tolerance": "70"
           }
@@ -972,7 +972,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -1008,7 +1008,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "125",
-              "cut":  "99.5"
+              "cut": "99.5"
             },
             "cm_tolerance": "70"
           }
@@ -1044,7 +1044,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "130",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -1080,7 +1080,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "130",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -1116,7 +1116,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "125",
-              "cut":  "99.5"
+              "cut": "99.5"
             },
             "cm_tolerance": "70"
           }
@@ -1152,7 +1152,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "130",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -1188,7 +1188,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -1224,7 +1224,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "95"
           }
@@ -1260,7 +1260,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }
@@ -1296,7 +1296,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "90",
-              "cut":  "99"
+              "cut": "99"
             },
             "cm_tolerance": "50"
           }
@@ -1332,7 +1332,7 @@
             "calc": {
               "type": "StairstepExponentialDecrease",
               "step": "120",
-              "cut":  "99.9"
+              "cut": "99.9"
             },
             "cm_tolerance": "95"
           }

@@ -22,9 +22,6 @@ for (let token in data.tokens) {
   tokensArray.push(newToken);
 }
 
-// 替换原来的"tokens"对象为新的数组
-newData.tokens = tokensArray;
-newData.import = data.import;
 let global = {};
 /*
  "description": "Mainnet deployment",
@@ -77,6 +74,8 @@ global.flop_ttl = data.flop_ttl;
 global.flop_tau = data.flop_tau;
 global.flash_max = data.flash_max;
 newData.global = global;
+newData.import = data.import;
+newData.tokens = tokensArray;
 
 // 将新的JSON数据写回文件
 fs.writeFileSync(targetFile, JSON.stringify(newData, null, 2));
