@@ -22,11 +22,11 @@ pragma solidity >=0.8.20;
 import {DSTest} from "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
-import {GemJoin} from "../src/join.sol";
-import {LinearDecrease} from "../src/abaci.sol";
+import {GemJoin} from "../../src/join.sol";
+import {LinearDecrease} from "../../src/abaci.sol";
 
-import "../script/deploy.sol";
-import {GovActions} from "../script/govActions.sol";
+import "../../script/deploy.sol";
+import {GovActions} from "../../script/govActions.sol";
 
 interface Hevm {
   function warp(uint) external;

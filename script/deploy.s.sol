@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 import {DSValue} from "ds-value/value.sol";
 import "./deploy.sol";
-import "../test/deploy.t.base.sol";
+import "../test/deploy/deploy.t.base.sol";
 import {PipLike} from "../src/spot.sol";
 import {Config} from "./config.sol";
 
