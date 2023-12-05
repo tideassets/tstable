@@ -6,26 +6,16 @@ import {DSValue} from "ds-value/value.sol";
 import "./deploy.sol";
 import "../test/deploy.t.base.sol";
 import {PipLike} from "../src/spot.sol";
-import {ConfigInfo} from "./config.sol";
+import {Config} from "./config.sol";
 
 interface IPip is PipLike {
   function poke(bytes32) external;
   // function peek() external returns (bytes32, bool);
 }
 
-contract DeploySrcipt is DssDeployTestBase, Script {
+contract DeploySrcipt is Config, DssDeployTestBase {
   uint constant ONE = 10 ** 18;
-  uint public constant TOKEN_LENGTH = 35;
 
-  function parseConfig() public view returns (ConfigInfo.Token[] memory tokens) {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
-    tokens = new ConfigInfo.Token[](TOKEN_LENGTH);
-    for (uint i = 0; i < TOKEN_LENGTH; i++) {
-      bytes memory jsonBytes =
-        vm.parseJson(json, string(abi.encodePacked(".tokens[", vm.toString(i), "]")));
-      tokens[i] = abi.decode(jsonBytes, (ConfigInfo.Token));
-    }
-  }
 
   // function gemJoin() internal {
   //   require(address(vat) != address(0), "vat must deployed before do this");
@@ -56,8 +46,8 @@ contract DeploySrcipt is DssDeployTestBase, Script {
   }
 
   function run() public {
-    ConfigInfo.Config memory config = ConfigInfo.initConfig();
-    ConfigInfo.Token[] memory ts = parseConfig();
+    Global memory config = initGlobalConfig();
+    Token[] memory ts = parseConfig();
     console2.log("token length: %s", vm.toString(ts.length));
 
     // deploy the contract

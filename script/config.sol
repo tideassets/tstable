@@ -3,18 +3,30 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
 
-library ConfigInfo {
+abstract contract Config is Script {
   // 定义Calc结构体
-  struct Calc {
+  struct RawCalc {
     string cut;
     string step;
     string calcType;
   }
 
+  struct Calc {
+    uint cut;
+    uint step;
+    string calcType;
+  }
+
+  function convCalc(RawCalc calldata in_) internal pure returns (Calc memory out_) {
+    out_.calcType = in_.calcType;
+    out_.cut = vm.parseUint(in_.cut);
+    out_.step = vm.parseUint(in_.step);
+  }
+
   // 定义ClipDeploy结构体
-  struct ClipDeploy {
+  struct RawClipDeploy {
     string buf;
-    Calc calc;
+    RawCalc calc;
     string chip;
     string chop;
     string cusp;
@@ -24,17 +36,70 @@ library ConfigInfo {
     string cm_tolerance;
   }
 
+  struct ClipDeploy {
+    uint buf;
+    Calc calc;
+    uint chip;
+    uint chop;
+    uint cusp;
+    uint hole;
+    uint tail;
+    uint tip;
+    uint cm_tolerance;
+  }
+
+  function convClipDeploy(RawClipDeploy calldata in_)
+    internal
+    pure
+    returns (ClipDeploy memory out_)
+  {
+    out_.buf = vm.parseUint(in_.buf);
+    convCalc(in_.calc);
+    // out_.chip = vm.parseUint(in_.chip);
+    out_.chip = 10; // 0.1
+    out_.chop = vm.parseUint(in_.chop);
+    out_.cusp = vm.parseUint(in_.cusp);
+    out_.hole = vm.parseUint(in_.hole);
+    out_.tail = vm.parseUint(in_.tail);
+    out_.tip = vm.parseUint(in_.tip);
+    out_.cm_tolerance = vm.parseUint(in_.cm_tolerance);
+  }
   // 定义Ilk结构体
-  struct Ilk {
+
+  struct RawIlk {
     string autoLine;
     string autoLineGap;
     string autoLineTtl;
-    ClipDeploy clipDeploy;
+    RawClipDeploy clipDeploy;
     string dust;
     string duty;
     string line;
     string mat;
     string name;
+  }
+
+  struct Ilk {
+    uint autoLine;
+    uint autoLineGap;
+    uint autoLineTtl;
+    ClipDeploy clipDeploy;
+    uint dust;
+    uint duty;
+    uint line;
+    uint mat;
+    string name;
+  }
+
+  function convIlk(RawIlk calldata in_) internal pure returns (Ilk memory out_) {
+    out_.autoLine = vm.parseUint(in_.autoLine);
+    out_.autoLineGap = vm.parseUint(in_.autoLineGap);
+    out_.autoLineTtl = vm.parseUint(in_.autoLineTtl);
+    out_.clipDeploy = convClipDeploy(in_.clipDeploy);
+    out_.dust = vm.parseUint(in_.dust);
+    out_.duty = vm.parseUint(in_.duty);
+    out_.line = vm.parseUint(in_.line);
+    out_.mat = vm.parseUint(in_.mat);
+    out_.name = in_.name;
   }
 
   struct Import {
@@ -53,11 +118,41 @@ library ConfigInfo {
   }
 
   // 定义Token结构体
+  struct RawToken {
+    RawIlk[] ilks;
+    Import importx;
+    JoinDeploy joinDeploy;
+    string name;
+  }
+
   struct Token {
     Ilk[] ilks;
     Import importx;
     JoinDeploy joinDeploy;
     string name;
+  }
+
+  function convToken(RawToken calldata in_) internal pure returns (Token memory out_) {
+    out_.name = in_.name;
+    out_.importx = in_.importx;
+    out_.joinDeploy = in_.joinDeploy;
+    out_.ilks = new Ilk[](in_.ilks.length);
+    for (uint i = 0; i < in_.ilks.length; i++) {
+      out_.ilks[i] = convIlk(in_.ilks[i]);
+    }
+  }
+
+  struct RawConfig0 {
+    string pauseDelay;
+    string vat_line;
+    string vow_wait;
+    string vow_dump;
+    string vow_sump;
+    string vow_bump;
+    string vow_hump;
+    string cat_box;
+    string dog_hole;
+    string jug_base;
   }
 
   struct Config0 {
@@ -71,6 +166,35 @@ library ConfigInfo {
     uint cat_box;
     uint dog_hole;
     uint jug_base;
+  }
+
+  function convConfig0(RawConfig0 calldata in_) internal pure returns (Config0 memory out_) {
+    out_.pauseDelay = vm.parseUint(in_.pauseDelay);
+    out_.vat_line = vm.parseUint(in_.vat_line);
+    out_.vow_wait = vm.parseUint(in_.vow_wait);
+    out_.vow_dump = vm.parseUint(in_.vow_dump);
+    out_.vow_sump = vm.parseUint(in_.vow_sump);
+    out_.vow_bump = vm.parseUint(in_.vow_bump);
+    out_.vow_hump = vm.parseUint(in_.vow_hump);
+    out_.cat_box = vm.parseUint(in_.cat_box);
+    out_.dog_hole = vm.parseUint(in_.dog_hole);
+    out_.jug_base = vm.parseUint(in_.jug_base);
+  }
+
+  struct RawConfig1 {
+    string pot_dsr;
+    string cure_wait;
+    string end_wait;
+    string esm_min;
+    string flap_beg;
+    string flap_ttl;
+    string flap_tau;
+    string flap_lid;
+    string flop_beg;
+    string flop_pad;
+    string flop_ttl;
+    string flop_tau;
+    string flash_max;
   }
 
   struct Config1 {
@@ -89,12 +213,28 @@ library ConfigInfo {
     uint flash_max;
   }
 
-  struct Config {
+  function convConfig1(RawConfig1 calldata in_) internal pure returns (Config1 memory out_) {
+    out_.pot_dsr = vm.parseUint(in_.pot_dsr);
+    out_.cure_wait = vm.parseUint(in_.cure_wait);
+    out_.end_wait = vm.parseUint(in_.end_wait);
+    out_.esm_min = vm.parseUint(in_.esm_min);
+    out_.flap_beg = vm.parseUint(in_.flap_beg);
+    out_.flap_ttl = vm.parseUint(in_.flap_ttl);
+    out_.flap_tau = vm.parseUint(in_.flap_tau);
+    out_.flap_lid = vm.parseUint(in_.flap_lid);
+    out_.flop_beg = vm.parseUint(in_.flop_beg);
+    out_.flop_pad = vm.parseUint(in_.flop_pad);
+    out_.flop_ttl = vm.parseUint(in_.flop_ttl);
+    out_.flop_tau = vm.parseUint(in_.flop_tau);
+    out_.flash_max = vm.parseUint(in_.flash_max);
+  }
+
+  struct Global {
     Config0 config0;
     Config1 config1;
   }
 
-  function initConfig() internal pure returns (Config memory config) {
+  function initGlobalConfig() internal pure returns (Global memory config) {
     uint ONE = 10 ** 18;
     config.config0 = Config0({
       pauseDelay: 0,
@@ -124,7 +264,33 @@ library ConfigInfo {
       flash_max: 500000000 * ONE
     });
   }
+
+  uint public constant TOKEN_LENGTH = 35;
+
+  function parseTokenConfig() public view returns (Token[] memory tokens) {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    tokens = new Token[](TOKEN_LENGTH);
+    for (uint i = 0; i < TOKEN_LENGTH; i++) {
+      bytes memory jsonBytes =
+        vm.parseJson(json, string(abi.encodePacked(".tokens[", vm.toString(i), "]")));
+      tokens[i] = abi.decode(jsonBytes, (Token));
+    }
+  }
+
+  function parseConfig0() public view returns (RawConfig0 memory config) {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    bytes memory jsonBytes = vm.parseJson(json, ".config0");
+    config = abi.decode(jsonBytes, (RawConfig0));
+  }
+
+  function parseConfig1() public view returns (RawConfig1 memory config) {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    bytes memory jsonBytes = vm.parseJson(json, ".config1");
+    config = abi.decode(jsonBytes, (RawConfig1));
+  }
 }
+
+/*
 
 contract TokenList {
   mapping(bytes32 => address) public tokens;
@@ -179,3 +345,5 @@ library GoerlyTokens {
   uint public constant WSTETH_PRICE = 2000 * 10 ** 18;
   uint public constant BAT_PRICE = 2 ** 18;
 }
+
+*/
