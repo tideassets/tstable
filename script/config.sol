@@ -74,7 +74,7 @@ abstract contract Config is Script {
     string name;
   }
 
-  struct Ilk {
+  struct Ilkx {
     uint autoLine;
     uint autoLineGap;
     uint autoLineTtl;
@@ -86,7 +86,7 @@ abstract contract Config is Script {
     string name;
   }
 
-  function convIlk(RawIlk memory in_) public pure returns (Ilk memory out_) {
+  function convIlk(RawIlk memory in_) public pure returns (Ilkx memory out_) {
     out_.autoLine = vm.parseUint(in_.autoLine);
     out_.autoLineGap = vm.parseUint(in_.autoLineGap);
     out_.autoLineTtl = vm.parseUint(in_.autoLineTtl);
@@ -122,7 +122,7 @@ abstract contract Config is Script {
   }
 
   struct Token {
-    Ilk[] ilks;
+    Ilkx[] ilks;
     Import importx;
     JoinDeploy joinDeploy;
     string name;
@@ -132,7 +132,7 @@ abstract contract Config is Script {
     out_.name = in_.name;
     out_.importx = in_.importx;
     out_.joinDeploy = in_.joinDeploy;
-    out_.ilks = new Ilk[](in_.ilks.length);
+    out_.ilks = new Ilkx[](in_.ilks.length);
     for (uint i = 0; i < in_.ilks.length; i++) {
       out_.ilks[i] = convIlk(in_.ilks[i]);
     }

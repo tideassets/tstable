@@ -2,8 +2,9 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
+import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
-import {DSAuth} from "ds-auth/auth.sol";
+import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {PipLike} from "../src/spot.sol";
 import {Config} from "./config.sol";
 import {GovActions} from "dss-deploy/govActions.sol";
@@ -12,42 +13,27 @@ import "dss-deploy/DssDeploy.sol";
 import {ProxyActions, MockGuard} from "dss-deploy/DssDeploy.t.base.sol";
 import {GovActions} from "dss-deploy/govActions.sol";
 import {ProxyCalls} from "dss-proxy-actions/DssProxyActions.t.sol";
+import {
+  DssProxyActions,
+  DssProxyActionsEnd,
+  DssProxyActionsDsr
+} from "dss-proxy-actions/DssProxyActions.sol";
 import {ProxyRegistry, DSProxyFactory, DSProxy} from "proxy-registry/ProxyRegistry.sol";
 
-contract Authority is MockGuard, DSAuth {
-  function permit(address src, address dst, bytes4 sig) public auth {
-    return super.permit(src, dst, sig);
+contract Authority is DSAuth, DSAuthority {
+  MockGuard internal mg;
+
+  constructor() {
+    mg = new MockGuard();
   }
-}
 
-contract DssDeployTestBase is DSTest, ProxyActions {
-  Hevm hevm;
+  function canCall(address src, address dst, bytes4 sig) external view returns (bool) {
+    return mg.canCall(src, dst, sig);
+  }
 
-  VatFab vatFab;
-  JugFab jugFab;
-  VowFab vowFab;
-  CatFab catFab;
-  DogFab dogFab;
-  DaiFab daiFab;
-  DaiJoinFab daiJoinFab;
-  FlapFab flapFab;
-  FlopFab flopFab;
-  FlipFab flipFab;
-  ClipFab clipFab;
-  CalcFab calcFab;
-  SpotFab spotFab;
-  PotFab potFab;
-  CureFab cureFab;
-  EndFab endFab;
-  ESMFab esmFab;
-  PauseFab pauseFab;
-
-  DssDeploy dssDeploy;
-
-  DSToken gov;
-  DSValue pipETH;
-  DSValue pipCOL;
-  DSValue pipCOL2;
+  function permit(address src, address dst, bytes4 sig) public auth {
+    return mg.permit(src, dst, sig);
+  }
 }
 
 contract Admin is ProxyActions {
@@ -62,52 +48,16 @@ contract User is ProxyCalls {
     dssProxyActions = address(new DssProxyActions());
     dssProxyActionsEnd = address(new DssProxyActionsEnd());
     dssProxyActionsDsr = address(new DssProxyActionsDsr());
-    ProxyRegistry registry = ProxyRegistry(prxoxyRegistry_);
+    ProxyRegistry registry = ProxyRegistry(proxyRegistry_);
     proxy = DSProxy(registry.build());
   }
 }
 
-contract DeploySrcipt is Config, ProxyActions, ProxyCalls {
-  uint constant ONE = 10 ** 18;
-  VatFab vatFab;
-  JugFab jugFab;
-  VowFab vowFab;
-  CatFab catFab;
-  DogFab dogFab;
-  DaiFab daiFab;
-  DaiJoinFab daiJoinFab;
-  FlapFab flapFab;
-  FlopFab flopFab;
-  FlipFab flipFab;
-  ClipFab clipFab;
-  CalcFab calcFab;
-  SpotFab spotFab;
-  PotFab potFab;
-  CureFab cureFab;
-  EndFab endFab;
-  ESMFab esmFab;
-  PauseFab pauseFab;
-
-  DssDeploy dssDeploy;
-
-  Vat vat;
-  Jug jug;
-  Vow vow;
-  Cat cat;
-  Dog dog;
-  Flapper flap;
-  Flopper flop;
-  Dai dai;
-  DaiJoin daiJoin;
-  Spotter spotter;
-  Pot pot;
-  Cure cure;
-  End end;
-  ESM esm;
-
+contract DeploySrcipt is Config, DssDeploy {
   ProxyRegistry registry;
-  Authority authority;
   Admin admin;
+  Authority authx;
+  address gov;
 
   function createUser() public returns (address) {
     return address(new User(address(registry)));
@@ -132,13 +82,13 @@ contract DeploySrcipt is Config, ProxyActions, ProxyCalls {
     endFab = new EndFab();
     esmFab = new ESMFab();
     pauseFab = new PauseFab();
-    govActions = new GovActions();
-    dssDeploy = new DssDeploy();
-    proxyRegistry = new ProxyRegistry(address(new proxyFactory()));
-    authority = new Authority();
 
-    dssDeploy.addFabs1(vatFab, jugFab, vowFab, catFab, dogFab, daiFab, daiJoinFab);
-    dssDeploy.addFabs2(
+    registry = new ProxyRegistry(address(new DSProxyFactory()));
+    authx = new Authority();
+    gov = address(new DSToken("GOV"));
+
+    addFabs1(vatFab, jugFab, vowFab, catFab, dogFab, daiFab, daiJoinFab);
+    addFabs2(
       flapFab,
       flopFab,
       flipFab,
@@ -154,33 +104,17 @@ contract DeploySrcipt is Config, ProxyActions, ProxyCalls {
   }
 
   function _dssDeploy(uint chainId) internal {
-    dssDeploy.deployVat();
-    dssDeploy.deployDai(chainId);
-    dssDeploy.deployTaxation();
-    dssDeploy.deployAuctions(address(gov));
-    dssDeploy.deployLiquidator();
-    dssDeploy.deployEnd();
-    dssDeploy.deployPause(0, address(authority));
-    dssDeploy.deployESM(address(gov), 10);
+    deployVat();
+    deployDai(chainId);
+    deployTaxation();
+    deployAuctions(gov);
+    deployLiquidator();
+    deployEnd();
+    deployPause(0, address(authx));
+    deployESM(address(gov), 10);
 
-    vat = dssDeploy.vat();
-    jug = dssDeploy.jug();
-    vow = dssDeploy.vow();
-    cat = dssDeploy.cat();
-    dog = dssDeploy.dog();
-    flap = dssDeploy.flap();
-    flop = dssDeploy.flop();
-    dai = dssDeploy.dai();
-    daiJoin = dssDeploy.daiJoin();
-    spotter = dssDeploy.spotter();
-    pot = dssDeploy.pot();
-    cure = dssDeploy.cure();
-    end = dssDeploy.end();
-    esm = dssDeploy.esm();
-
-    DSPause pause = dssDeploy.pause();
     admin = new Admin(address(pause));
-    authority.permit(
+    authx.permit(
       address(admin), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
     );
   }
@@ -188,7 +122,7 @@ contract DeploySrcipt is Config, ProxyActions, ProxyCalls {
   function run() public {
     string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
     G memory g = parseConfig(json);
-    // console2.log("g.golbal.vat_line", g.global.vat_line);
+    console2.log("g.golbal.vat_line", g.global.vat_line);
     // console2.log("g.import.gov", g.importx.gov);
     // console2.log("g.tokens.length", g.tokens.length);
 
