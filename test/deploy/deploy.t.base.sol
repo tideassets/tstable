@@ -25,8 +25,8 @@ import {DSValue} from "ds-value/value.sol";
 import {GemJoin} from "../../src/join.sol";
 import {LinearDecrease} from "../../src/abaci.sol";
 
-import "../../script/deploy.sol";
-import {GovActions} from "../../script/govActions.sol";
+import "dss-deploy/DssDeploy.sol";
+import {GovActions} from "dss-deploy/govActions.sol";
 
 interface Hevm {
   function warp(uint) external;

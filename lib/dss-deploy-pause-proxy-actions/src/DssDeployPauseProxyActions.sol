@@ -18,127 +18,165 @@
 pragma solidity >=0.5.12;
 
 interface PauseLike {
-    function plot(address, bytes32, bytes calldata, uint) external;
-    function exec(address, bytes32, bytes calldata, uint) external;
+  function plot(address, bytes32, bytes calldata, uint) external;
+  function exec(address, bytes32, bytes calldata, uint) external;
 }
 
 contract DssDeployPauseProxyActions {
-    function file(address pause, address actions, address who, bytes32 what, uint data) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data),
-            now
-        );
+  function file(address pause, address actions, address who, bytes32 what, uint data) external {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data),
+      block.timestamp
+    );
+  }
 
-    function file(address pause, address actions, address who, bytes32 ilk, bytes32 what, uint data) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data),
-            now
-        );
+  function file(address pause, address actions, address who, bytes32 ilk, bytes32 what, uint data)
+    external
+  {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data),
+      block.timestamp
+    );
+  }
 
-    function file(address pause, address actions, address who, bytes32 ilk, bytes32 what, address data) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,bytes32,address)", who, ilk, what, data),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("file(address,bytes32,bytes32,address)", who, ilk, what, data),
-            now
-        );
+  function file(
+    address pause,
+    address actions,
+    address who,
+    bytes32 ilk,
+    bytes32 what,
+    address data
+  ) external {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,bytes32,address)", who, ilk, what, data),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("file(address,bytes32,bytes32,address)", who, ilk, what, data),
+      block.timestamp
+    );
+  }
 
-    function rely(address pause, address actions, address who, address to) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("rely(address,address)", who, to),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("rely(address,address)", who, to),
-            now
-        );
+  function rely(address pause, address actions, address who, address to) external {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("rely(address,address)", who, to),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("rely(address,address)", who, to),
+      block.timestamp
+    );
+  }
 
-    function dripAndFile(address pause, address actions, address who, bytes32 what, uint data) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data),
-            now
-        );
+  function dripAndFile(address pause, address actions, address who, bytes32 what, uint data)
+    external
+  {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data),
+      block.timestamp
+    );
+  }
 
-    function dripAndFile(address pause, address actions, address who, bytes32 ilk, bytes32 what, uint data) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data),
-            now
-        );
+  function dripAndFile(
+    address pause,
+    address actions,
+    address who,
+    bytes32 ilk,
+    bytes32 what,
+    uint data
+  ) external {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data),
+      block.timestamp
+    );
+  }
 
-    function setAuthorityAndDelay(address pause, address actions, address newAuthority, uint newDelay) external {
-        bytes32 tag;
-        assembly { tag := extcodehash(actions) }
-        PauseLike(pause).plot(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay),
-            now
-        );
-        PauseLike(pause).exec(
-            address(actions),
-            tag,
-            abi.encodeWithSignature("setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay),
-            now
-        );
+  function setAuthorityAndDelay(address pause, address actions, address newAuthority, uint newDelay)
+    external
+  {
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(actions)
     }
+    PauseLike(pause).plot(
+      address(actions),
+      tag,
+      abi.encodeWithSignature(
+        "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
+      ),
+      block.timestamp
+    );
+    PauseLike(pause).exec(
+      address(actions),
+      tag,
+      abi.encodeWithSignature(
+        "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
+      ),
+      block.timestamp
+    );
+  }
 }
