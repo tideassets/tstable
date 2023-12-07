@@ -3,158 +3,71 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 import {DSValue} from "ds-value/value.sol";
+import {DSAuth} from "ds-auth/auth.sol";
 import {PipLike} from "../src/spot.sol";
 import {Config} from "./config.sol";
 import {GovActions} from "dss-deploy/govActions.sol";
 import {DSPause} from "ds-pause/pause.sol";
 import "dss-deploy/DssDeploy.sol";
+import {ProxyActions, MockGuard} from "dss-deploy/DssDeploy.t.base.sol";
+import {GovActions} from "dss-deploy/govActions.sol";
+import {ProxyCalls} from "dss-proxy-actions/DssProxyActions.t.sol";
+import {ProxyRegistry, DSProxyFactory, DSProxy} from "proxy-registry/ProxyRegistry.sol";
 
-interface IPip is PipLike {
-  function poke(bytes32) external;
-  // function peek() external returns (bytes32, bool);
-}
-
-contract ProxyActions {
-  DSPause pause;
-  GovActions govActions;
-
-  function rely(address from, address to) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function deny(address from, address to) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function file(address who, bytes32 what, uint data) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function file(address who, bytes32 ilk, bytes32 what, uint data) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function dripAndFile(address who, bytes32 what, uint data) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function cage(address end) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("cage(address)", end);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setAuthority(address newAuthority) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setDelay(uint newDelay) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setAuthorityAndDelay(address newAuthority, uint newDelay) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature(
-      "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
-    );
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+contract Authority is MockGuard, DSAuth {
+  function permit(address src, address dst, bytes4 sig) public auth {
+    return super.permit(src, dst, sig);
   }
 }
 
-contract DeploySrcipt is Config, ProxyActions {
+contract DssDeployTestBase is DSTest, ProxyActions {
+  Hevm hevm;
+
+  VatFab vatFab;
+  JugFab jugFab;
+  VowFab vowFab;
+  CatFab catFab;
+  DogFab dogFab;
+  DaiFab daiFab;
+  DaiJoinFab daiJoinFab;
+  FlapFab flapFab;
+  FlopFab flopFab;
+  FlipFab flipFab;
+  ClipFab clipFab;
+  CalcFab calcFab;
+  SpotFab spotFab;
+  PotFab potFab;
+  CureFab cureFab;
+  EndFab endFab;
+  ESMFab esmFab;
+  PauseFab pauseFab;
+
+  DssDeploy dssDeploy;
+
+  DSToken gov;
+  DSValue pipETH;
+  DSValue pipCOL;
+  DSValue pipCOL2;
+}
+
+contract Admin is ProxyActions {
+  constructor(address pause_) {
+    govActions = new GovActions();
+    pause = DSPause(pause_);
+  }
+}
+
+contract User is ProxyCalls {
+  constructor(address proxyRegistry_) {
+    dssProxyActions = address(new DssProxyActions());
+    dssProxyActionsEnd = address(new DssProxyActionsEnd());
+    dssProxyActionsDsr = address(new DssProxyActionsDsr());
+    ProxyRegistry registry = ProxyRegistry(prxoxyRegistry_);
+    proxy = DSProxy(registry.build());
+  }
+}
+
+contract DeploySrcipt is Config, ProxyActions, ProxyCalls {
   uint constant ONE = 10 ** 18;
   VatFab vatFab;
   JugFab jugFab;
@@ -192,6 +105,14 @@ contract DeploySrcipt is Config, ProxyActions {
   End end;
   ESM esm;
 
+  ProxyRegistry registry;
+  Authority authority;
+  Admin admin;
+
+  function createUser() public returns (address) {
+    return address(new User(address(registry)));
+  }
+
   function _setup() internal {
     vatFab = new VatFab();
     jugFab = new JugFab();
@@ -211,12 +132,12 @@ contract DeploySrcipt is Config, ProxyActions {
     endFab = new EndFab();
     esmFab = new ESMFab();
     pauseFab = new PauseFab();
-    // govActions = new GovActions();
-
+    govActions = new GovActions();
     dssDeploy = new DssDeploy();
+    proxyRegistry = new ProxyRegistry(address(new proxyFactory()));
+    authority = new Authority();
 
     dssDeploy.addFabs1(vatFab, jugFab, vowFab, catFab, dogFab, daiFab, daiJoinFab);
-
     dssDeploy.addFabs2(
       flapFab,
       flopFab,
@@ -256,10 +177,12 @@ contract DeploySrcipt is Config, ProxyActions {
     cure = dssDeploy.cure();
     end = dssDeploy.end();
     esm = dssDeploy.esm();
-    pause = dssDeploy.pause();
-    // authority.permit(
-    //   address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
-    // );
+
+    DSPause pause = dssDeploy.pause();
+    admin = new Admin(address(pause));
+    authority.permit(
+      address(admin), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
+    );
   }
 
   function run() public {
