@@ -19,9 +19,10 @@
 
 pragma solidity >=0.8.20;
 
-import "./deploy.t.base.sol";
+// import "./deploy.t.base.sol";
+import "./dep.t.sol";
 
-contract DssDeployTest is DssDeployTestBase {
+contract DssDeployTest is DeployBase {
   function testDeploy() public {
     deploy();
   }

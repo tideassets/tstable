@@ -37,8 +37,8 @@ contract Authority is DSAuth, DSAuthority {
 }
 
 contract Admin is ProxyActions {
-  constructor(address pause_) {
-    govActions = new GovActions();
+  constructor(address pause_, address govActions_) {
+    govActions = GovActions(govActions_);
     pause = DSPause(pause_);
   }
 }
@@ -56,14 +56,15 @@ contract User is ProxyCalls {
 contract DeploySrcipt is Config, DssDeploy {
   ProxyRegistry registry;
   Admin admin;
-  Authority authx;
-  address gov;
+  Authority public authx;
+  DSToken public gov;
+  GovActions public govActions;
 
   function createUser() public returns (address) {
     return address(new User(address(registry)));
   }
 
-  function _setup() internal {
+  function setUp() public {
     vatFab = new VatFab();
     jugFab = new JugFab();
     vowFab = new VowFab();
@@ -83,37 +84,39 @@ contract DeploySrcipt is Config, DssDeploy {
     esmFab = new ESMFab();
     pauseFab = new PauseFab();
 
+    govActions = new GovActions();
     registry = new ProxyRegistry(address(new DSProxyFactory()));
     authx = new Authority();
-    gov = address(new DSToken("GOV"));
+    gov = new DSToken("GOV");
+    gov.setAuthority(DSAuthority(address(new MockGuard())));
+  }
 
-    addFabs1(vatFab, jugFab, vowFab, catFab, dogFab, daiFab, daiJoinFab);
-    addFabs2(
-      flapFab,
-      flopFab,
-      flipFab,
-      clipFab,
-      calcFab,
-      spotFab,
-      potFab,
-      cureFab,
-      endFab,
-      esmFab,
-      pauseFab
+  function pauseAuth() public auth {
+    authx.permit(
+      msg.sender, address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
     );
   }
 
-  function _dssDeploy(uint chainId) internal {
+  function govAuth() public auth {
+    MockGuard(address(gov.authority())).permit(
+      msg.sender, address(gov), bytes4(keccak256("mint(uint256)"))
+    );
+    MockGuard(address(gov.authority())).permit(
+      msg.sender, address(gov), bytes4(keccak256("mint(address,uint256)"))
+    );
+  }
+
+  function dssDeploy(uint chainId) public {
     deployVat();
     deployDai(chainId);
     deployTaxation();
-    deployAuctions(gov);
+    deployAuctions(address(gov));
     deployLiquidator();
     deployEnd();
     deployPause(0, address(authx));
     deployESM(address(gov), 10);
 
-    admin = new Admin(address(pause));
+    admin = new Admin(address(pause), address(govActions));
     authx.permit(
       address(admin), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
     );
@@ -132,8 +135,8 @@ contract DeploySrcipt is Config, DssDeploy {
     vm.startBroadcast(deployerPrivateKey);
 
     // deploy the contract
-    _setup();
-    _dssDeploy(chianId);
+    setUp();
+    dssDeploy(chianId);
 
     vm.stopBroadcast();
   }
