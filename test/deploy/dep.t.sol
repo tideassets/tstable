@@ -99,12 +99,12 @@ contract DeployBase is Test, ProxyActions {
     pipCOL2 = new DSValue();
     user1 = new FakeUser();
     user2 = new FakeUser();
-    dssDeploy.setUp();
+    dssDeploy.setUpFabs();
     hevm = vm;
   }
 
   function _dssDeploy() internal {
-    dssDeploy.dssDeploy(99);
+    dssDeploy.dssDeploy(99, 10000 ether);
     vat = dssDeploy.vat();
     jug = dssDeploy.jug();
     vow = dssDeploy.vow();

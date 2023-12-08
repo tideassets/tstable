@@ -79,7 +79,7 @@ contract DeploySrcipt is Config, DssDeploy {
     return address(new User(address(registry)));
   }
 
-  function setUp() public {
+  function setUpFabs() public {
     vatFab = new VatFab();
     jugFab = new JugFab();
     vowFab = new VowFab();
@@ -124,7 +124,7 @@ contract DeploySrcipt is Config, DssDeploy {
     return Authority(address(pause.authority()));
   }
 
-  function dssDeploy(uint chainId) public {
+  function dssDeploy(uint chainId, uint minGov) public {
     deployVat();
     deployDai(chainId);
     deployTaxation();
@@ -132,35 +132,34 @@ contract DeploySrcipt is Config, DssDeploy {
     deployLiquidator();
     deployEnd();
     deployPause(0, address(new Authority()));
-    deployESM(address(gov), 10);
+    deployESM(address(gov), minGov);
 
     admin = new Admin(address(pause), address(govActions));
     Authority(address(pause.authority())).permit(
-      address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
+      address(admin), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)"))
     );
   }
 
-  function run() public {
+  function runOut(uint chainId) public {
     string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
     G memory g = parseConfig(json);
     initTokens(g.tokens);
 
-    uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-    uint chianId = vm.envUint("CHAIN_ID");
-
-    vm.startBroadcast(deployerPrivateKey);
-
     // deploy the contract
-    setUp();
-    dssDeploy(chianId);
-    releaseAuth();
+    setUpFabs();
+    dssDeploy(chainId, WAD * g.global.esm_min);
     // set param
     setParam(g.global);
+    // deploy testnet tokens
+    deployTestnetTokens();
     // deploy ilks
     deployIlks();
 
-    vm.stopBroadcast();
+    releaseAuth();
+    admin.setDelay(1 hours);
   }
+
+  function run() public {}
 
   function initTokens(Token[] memory tokens_) public {
     tokenNames.push("WETH");
@@ -191,10 +190,11 @@ contract DeploySrcipt is Config, DssDeploy {
     }
   }
 
-  uint constant TOKEN_SUPLY = 1e10 ether;
+  uint constant TOKEN_SUPLY = 1e9 ether;
   uint constant WAD = 10 ** 18;
   uint constant RAY = 10 ** 27;
   uint constant RAD = 10 ** 45;
+  uint constant PENCENT_DIVIDER = 10000;
 
   function deployTestnetTokens() public {
     for (uint i = 0; i < tokenNames.length; i++) {
@@ -240,7 +240,7 @@ contract DeploySrcipt is Config, DssDeploy {
     for (uint i = 0; i < tokenNames.length; i++) {
       bytes32 tname = tokenNames[i];
       Token memory token = tokens[tname];
-      for (uint j = 0; i < token.ilks.length; j++) {
+      for (uint j = 0; j < token.ilks.length; j++) {
         Ilkx memory ilkx = token.ilks[j];
         bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
         address join;
@@ -252,7 +252,7 @@ contract DeploySrcipt is Config, DssDeploy {
           join = address(new GemJoin(address(vat), iname, token.importx.gem));
         }
         StairstepExponentialDecrease calc = calcFab.newStairstepExponentialDecrease(address(this));
-        calc.file(bytes32("tau"), 1 hours);
+        // calc.file(bytes32("tau"), 1 hours);
         calc.file(bytes32("cut"), RAY * ilkx.clipDeploy.calc.cut);
         calc.file(bytes32("step"), ilkx.clipDeploy.calc.step);
         deployCollateralClip(iname, join, token.importx.pip, address(calc));
@@ -263,18 +263,18 @@ contract DeploySrcipt is Config, DssDeploy {
         admin.file(address(vat), iname, bytes32("line"), RAD * ilkx.line);
         admin.file(address(vat), iname, bytes32("dust"), RAD * ilkx.dust);
         // jug
-        admin.file(address(jug), iname, bytes32("duty"), RAY * ilkx.duty);
+        admin.file(address(jug), iname, bytes32("duty"), RAY * ilkx.duty / PENCENT_DIVIDER);
         // spotter
-        admin.file(address(spotter), iname, bytes32("mat"), RAY * ilkx.mat);
+        admin.file(address(spotter), iname, bytes32("mat"), RAY * ilkx.mat / PENCENT_DIVIDER);
         // dog
         admin.file(address(dog), iname, bytes32("hole"), RAD * ilkx.clipDeploy.hole);
         admin.file(address(dog), iname, bytes32("chop"), WAD * ilkx.clipDeploy.chop);
         // clip
-        admin.file(address(ilk.clip), iname, bytes32("buf"), RAY * ilkx.clipDeploy.buf);
-        admin.file(address(ilk.clip), iname, bytes32("tail"), ilkx.clipDeploy.tail);
-        admin.file(address(ilk.clip), iname, bytes32("cusp"), RAY * ilkx.clipDeploy.cusp);
-        admin.file(address(ilk.clip), iname, bytes32("chip"), WAD * ilkx.clipDeploy.chip);
-        admin.file(address(ilk.clip), iname, bytes32("tip"), RAY * ilkx.clipDeploy.tip);
+        admin.file(address(ilk.clip), bytes32("buf"), RAY * ilkx.clipDeploy.buf / PENCENT_DIVIDER);
+        admin.file(address(ilk.clip), bytes32("tail"), ilkx.clipDeploy.tail);
+        admin.file(address(ilk.clip), bytes32("cusp"), RAY * ilkx.clipDeploy.cusp);
+        admin.file(address(ilk.clip), bytes32("chip"), WAD * ilkx.clipDeploy.chip / PENCENT_DIVIDER);
+        admin.file(address(ilk.clip), bytes32("tip"), RAY * ilkx.clipDeploy.tip);
       }
     }
   }
@@ -288,29 +288,39 @@ contract DeploySrcipt is Config, DssDeploy {
     admin.file(address(cure), bytes32("wait"), RAD * g.cure_wait);
     // end
     admin.file(address(end), bytes32("wait"), g.end_wait);
-    // esm
-    admin.file(address(esm), bytes32("min"), WAD * g.esm_min);
     // flap
-    admin.file(address(flap), bytes32("beg"), WAD * g.flap_beg);
+    admin.file(address(flap), bytes32("beg"), WAD * g.flap_beg / PENCENT_DIVIDER);
     admin.file(address(flap), bytes32("ttl"), g.flap_ttl);
     admin.file(address(flap), bytes32("tau"), g.flap_tau);
     admin.file(address(flap), bytes32("lid"), RAD * g.flap_lid);
     // flop
-    admin.file(address(flop), bytes32("beg"), WAD * g.flop_beg);
+    admin.file(address(flop), bytes32("beg"), WAD * g.flop_beg / PENCENT_DIVIDER);
     admin.file(address(flop), bytes32("ttl"), g.flop_ttl);
     admin.file(address(flop), bytes32("tau"), g.flop_tau);
-    admin.file(address(flop), bytes32("pad"), WAD * g.flop_pad);
+    admin.file(address(flop), bytes32("pad"), WAD * g.flop_pad / PENCENT_DIVIDER);
     // jug
-    admin.file(address(jug), bytes32("base"), RAY * g.jug_base);
+    admin.file(address(jug), bytes32("base"), RAY * g.jug_base / PENCENT_DIVIDER);
     // pot
-    admin.file(address(pot), bytes32("dsr"), RAY * g.pot_dsr);
+    admin.file(address(pot), bytes32("dsr"), RAY * g.pot_dsr / PENCENT_DIVIDER);
     // vow
     admin.file(address(vow), bytes32("wait"), g.vow_wait);
     admin.file(address(vow), bytes32("dump"), WAD * g.vow_dump);
     admin.file(address(vow), bytes32("sump"), RAD * g.vow_sump);
     admin.file(address(vow), bytes32("bump"), RAD * g.vow_bump);
     admin.file(address(vow), bytes32("hump"), RAD * g.vow_hump);
-    // pause
-    admin.file(address(pause), bytes32("delay"), g.pauseDelay);
+  }
+}
+
+contract Deploy is Script {
+  function run() public payable {
+    address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
+    uint chainId = vm.envUint("CHAIN_ID");
+    console2.log("deployer", deployer);
+
+    DeploySrcipt script = new DeploySrcipt();
+    script.setOwner(deployer);
+    vm.startBroadcast(deployer);
+    script.runOut(chainId);
+    vm.stopBroadcast();
   }
 }

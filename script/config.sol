@@ -6,24 +6,24 @@ import "forge-std/Script.sol";
 abstract contract Config is Script {
   // 定义Calc结构体
   struct RawCalc {
-    string calcType;
-    string cut;
+    string cut; // %
     string step;
-    string tu;
+    string calcType;
   }
+  // string tu;
 
   struct Calc {
     string calcType;
-    uint cut;
+    uint cut; // %
     uint step;
     uint tu;
   }
 
   function convCalc(RawCalc memory in_) public pure returns (Calc memory out_) {
     out_.calcType = in_.calcType;
-    out_.cut = vm.parseUint(in_.cut);
+    out_.cut = parsePercentString(in_.cut);
     out_.step = vm.parseUint(in_.step);
-    out_.tu = vm.parseUint(in_.tu);
+    // out_.tu = vm.parseUint(in_.tu);
   }
 
   // 定义ClipDeploy结构体
@@ -40,11 +40,11 @@ abstract contract Config is Script {
   }
 
   struct ClipDeploy {
-    uint buf;
+    uint buf; // %
     Calc calc;
-    uint chip;
-    uint chop;
-    uint cusp;
+    uint chip; // %
+    uint chop; // %
+    uint cusp; // %
     uint hole;
     uint tail;
     uint tip;
@@ -52,12 +52,11 @@ abstract contract Config is Script {
   }
 
   function convClipDeploy(RawClipDeploy memory in_) public pure returns (ClipDeploy memory out_) {
-    out_.buf = vm.parseUint(in_.buf);
+    out_.buf = parsePercentString(in_.buf);
     convCalc(in_.calc);
-    // out_.chip = vm.parseUint(in_.chip);
-    out_.chip = 10; // 0.1
-    out_.chop = vm.parseUint(in_.chop);
-    out_.cusp = vm.parseUint(in_.cusp);
+    out_.chip = parsePercentString(in_.chip);
+    out_.chop = parsePercentString(in_.chop);
+    out_.cusp = parsePercentString(in_.cusp);
     out_.hole = vm.parseUint(in_.hole);
     out_.tail = vm.parseUint(in_.tail);
     out_.tip = vm.parseUint(in_.tip);
@@ -71,9 +70,9 @@ abstract contract Config is Script {
     string autoLineTtl;
     RawClipDeploy clipDeploy;
     string dust;
-    string duty;
+    string duty; // %
     string line;
-    string mat;
+    string mat; // %
     string name;
   }
 
@@ -95,9 +94,9 @@ abstract contract Config is Script {
     out_.autoLineTtl = vm.parseUint(in_.autoLineTtl);
     out_.clipDeploy = convClipDeploy(in_.clipDeploy);
     out_.dust = vm.parseUint(in_.dust);
-    out_.duty = vm.parseUint(in_.duty);
+    out_.duty = parsePercentString(in_.duty);
     out_.line = vm.parseUint(in_.line);
-    out_.mat = vm.parseUint(in_.mat);
+    out_.mat = parsePercentString(in_.mat);
     if (out_.line == 0) {
       out_.line = out_.autoLine;
     }
@@ -238,18 +237,18 @@ abstract contract Config is Script {
     string dog_hole;
     string end_wait;
     string esm_min;
-    string flap_beg;
+    string flap_beg; // %
     string flap_lid;
     string flap_tau;
     string flap_ttl;
     string flash_max;
-    string flop_beg;
-    string flop_pad;
+    string flop_beg; // %
+    string flop_pad; // %
     string flop_tau;
     string flop_ttl;
-    string jug_base;
+    string jug_base; // %
     string pauseDelay;
-    string pot_dsr;
+    string pot_dsr; // %
     string vat_line;
     string vow_bump;
     string vow_dump;
@@ -291,18 +290,18 @@ abstract contract Config is Script {
     out_.dog_hole = vm.parseUint(in_.dog_hole);
     out_.end_wait = vm.parseUint(in_.end_wait);
     out_.esm_min = vm.parseUint(in_.esm_min);
-    out_.flap_beg = vm.parseUint(in_.flap_beg);
+    out_.flap_beg = parsePercentString(in_.flap_beg);
     out_.flap_lid = vm.parseUint(in_.flap_lid);
     out_.flap_tau = vm.parseUint(in_.flap_tau);
     out_.flap_ttl = vm.parseUint(in_.flap_ttl);
     out_.flash_max = vm.parseUint(in_.flash_max);
-    out_.flop_beg = vm.parseUint(in_.flop_beg);
-    out_.flop_pad = vm.parseUint(in_.flop_pad);
+    out_.flop_beg = parsePercentString(in_.flop_beg);
+    out_.flop_pad = parsePercentString(in_.flop_pad);
     out_.flop_tau = vm.parseUint(in_.flop_tau);
     out_.flop_ttl = vm.parseUint(in_.flop_ttl);
-    out_.jug_base = vm.parseUint(in_.jug_base);
+    out_.jug_base = parsePercentString(in_.jug_base);
     out_.pauseDelay = vm.parseUint(in_.pauseDelay);
-    out_.pot_dsr = vm.parseUint(in_.pot_dsr);
+    out_.pot_dsr = parsePercentString(in_.pot_dsr);
     out_.vat_line = vm.parseUint(in_.vat_line);
     out_.vow_bump = vm.parseUint(in_.vow_bump);
     out_.vow_dump = vm.parseUint(in_.vow_dump);
@@ -465,6 +464,34 @@ abstract contract Config is Script {
     bytes memory jsonBytes = vm.parseJson(json, ".config1");
     RawConfig1 memory rconfig = abi.decode(jsonBytes, (RawConfig1));
     config = convConfig1(rconfig);
+  }
+
+  function parsePercentString(string memory str) public pure returns (uint) {
+    bytes memory b = bytes(str);
+    uint i;
+    uint result = 0;
+    bool hasDot = false;
+    uint decimalPlaces = 2; // 默认小数点后有两位
+    for (; i < b.length; i++) {
+      uint8 tempByte = uint8(b[i]);
+      if (tempByte >= 48 && tempByte <= 57) {
+        result = result * 10 + (tempByte - 48); // convert char to number
+        if (hasDot) {
+          if (--decimalPlaces == 0) {
+            break;
+          }
+        }
+      } else if (tempByte == 46) {
+        require(!hasDot, "More than one dot in the string!");
+        hasDot = true;
+      } else {
+        revert("Invalid character in string!");
+      }
+    }
+    for (; decimalPlaces > 0; decimalPlaces--) {
+      result *= 10;
+    }
+    return result;
   }
 }
 
