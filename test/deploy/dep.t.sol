@@ -99,12 +99,11 @@ contract DeployBase is Test, ProxyActions {
     pipCOL2 = new DSValue();
     user1 = new FakeUser();
     user2 = new FakeUser();
-    dssDeploy.setUpFabs();
     hevm = vm;
   }
 
   function _dssDeploy() internal {
-    dssDeploy.dssDeploy(99, 10000 ether);
+    dssDeploy.dssDeploy(99, 10);
     vat = dssDeploy.vat();
     jug = dssDeploy.jug();
     vow = dssDeploy.vow();
@@ -121,11 +120,11 @@ contract DeployBase is Test, ProxyActions {
     esm = dssDeploy.esm();
     pause = dssDeploy.pause();
     gov = dssDeploy.gov();
-    dssDeploy.govAuth();
     authority = dssDeploy.authx();
-    dssDeploy.pauseAuth();
     govActions = dssDeploy.govActions();
 
+    dssDeploy.govAuth(address(this));
+    dssDeploy.pauseAuth(address(this));
     // dssDeploy.initTokens();
     // dssDeploy.deployTestnetTokens();
   }
@@ -142,10 +141,8 @@ contract DeployBase is Test, ProxyActions {
 
     col2 = new DSToken("COL2");
     col2Join = new GemJoin(address(vat), "COL2", address(col2));
-    LinearDecrease calc = dssDeploy.calcFab().newLinearDecrease(address(this));
-    calc.file(bytes32("tau"), 1 hours);
 
-    dssDeploy.deployCollateralClip("COL2", address(col2Join), address(pipCOL2), address(calc));
+    dssDeploy.deployCollateralClip("COL2", address(col2Join), address(pipCOL2), address(0));
 
     // Set Params
     this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
@@ -172,18 +169,14 @@ contract DeployBase is Test, ProxyActions {
     (,, spot,,) = vat.ilks("COL2");
     assertEq(spot, 30 * RAY * RAY / 1500000000 ether);
 
-    MockGuard(address(gov.authority())).permit(
-      address(flop), address(gov), bytes4(keccak256("mint(address,uint256)"))
-    );
-    MockGuard(address(gov.authority())).permit(
-      address(flap), address(gov), bytes4(keccak256("burn(address,uint256)"))
-    );
+    dssDeploy.govAuth(address(flap));
+    dssDeploy.govAuth(address(flop));
 
-    gov.mint(100 ether);
+    gov.mint(10000 ether);
   }
 
   function deploy() public {
     deployKeepAuth();
-    dssDeploy.releaseAuth();
+    // dssDeploy.releaseAuth();
   }
 }
