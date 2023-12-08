@@ -143,9 +143,7 @@ contract DeploySrcipt is Config, DssDeploy {
   function run() public {
     string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
     G memory g = parseConfig(json);
-    console2.log("g.golbal.vat_line", g.global.vat_line);
-    // console2.log("g.import.gov", g.importx.gov);
-    // console2.log("g.tokens.length", g.tokens.length);
+    initTokens(g.tokens);
 
     uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");
     uint chianId = vm.envUint("CHAIN_ID");
@@ -156,14 +154,16 @@ contract DeploySrcipt is Config, DssDeploy {
     setUp();
     dssDeploy(chianId);
     releaseAuth();
+    // set param
+    setParam(g.global);
+    // deploy ilks
+    deployIlks();
 
     vm.stopBroadcast();
   }
 
-  function setGlobalConfig(Global memory g) public {}
-
   function initTokens(Token[] memory tokens_) public {
-    tokenNames.push("ETH");
+    tokenNames.push("WETH");
     tokenNames.push("BAT");
     tokenNames.push("WBTC");
     tokenNames.push("LINK");
@@ -191,8 +191,6 @@ contract DeploySrcipt is Config, DssDeploy {
     }
   }
 
-  function initIlks() public {}
-
   uint constant TOKEN_SUPLY = 1e10 ether;
   uint constant WAD = 10 ** 18;
   uint constant RAY = 10 ** 27;
@@ -201,28 +199,39 @@ contract DeploySrcipt is Config, DssDeploy {
   function deployTestnetTokens() public {
     for (uint i = 0; i < tokenNames.length; i++) {
       bytes32 symbol = tokenNames[i];
-      tokens[symbol].importx.pip = address(new DSValue());
-      if (symbol == "ETH") {
+      DSValue pip = new DSValue();
+      if (symbol == "WETH") {
         tokens[symbol].importx.gem = address(new WETH9_());
+        pip.poke(bytes32(uint(2200 ether)));
       } else if (symbol == "BAT") {
         tokens[symbol].importx.gem = address(new BAT(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(2 ether)));
       } else if (symbol == "WBTC") {
         tokens[symbol].importx.gem = address(new WBTC(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(44000 ether)));
       } else if (symbol == "LINK") {
         tokens[symbol].importx.gem = address(new LINK(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(15 ether)));
       } else if (symbol == "AAVE") {
         tokens[symbol].importx.gem = address(new AAVE(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(100 ether)));
       } else if (symbol == "USDC") {
         tokens[symbol].importx.gem = address(new USDC(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(1 ether)));
       } else if (symbol == "USDT") {
         tokens[symbol].importx.gem = address(new USDT(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(1 ether)));
       } else if (symbol == "UNI") {
         tokens[symbol].importx.gem = address(new UNI(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(16 ether)));
       } else if (symbol == "MATIC") {
         tokens[symbol].importx.gem = address(new MATIC(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(54 ether)));
       } else if (symbol == "ZRX") {
         tokens[symbol].importx.gem = address(new ZRX(TOKEN_SUPLY));
+        pip.poke(bytes32(uint(25 ether)));
       }
+      tokens[symbol].importx.pip = address(pip);
     }
   }
 

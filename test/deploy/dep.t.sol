@@ -125,6 +125,9 @@ contract DeployBase is Test, ProxyActions {
     authority = dssDeploy.authx();
     dssDeploy.pauseAuth();
     govActions = dssDeploy.govActions();
+
+    // dssDeploy.initTokens();
+    // dssDeploy.deployTestnetTokens();
   }
 
   function deployKeepAuth() public {
