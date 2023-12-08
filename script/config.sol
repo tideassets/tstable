@@ -6,21 +6,24 @@ import "forge-std/Script.sol";
 abstract contract Config is Script {
   // 定义Calc结构体
   struct RawCalc {
+    string calcType;
     string cut;
     string step;
-    string calcType;
+    string tu;
   }
 
   struct Calc {
+    string calcType;
     uint cut;
     uint step;
-    string calcType;
+    uint tu;
   }
 
   function convCalc(RawCalc memory in_) public pure returns (Calc memory out_) {
     out_.calcType = in_.calcType;
     out_.cut = vm.parseUint(in_.cut);
     out_.step = vm.parseUint(in_.step);
+    out_.tu = vm.parseUint(in_.tu);
   }
 
   // 定义ClipDeploy结构体
@@ -95,6 +98,9 @@ abstract contract Config is Script {
     out_.duty = vm.parseUint(in_.duty);
     out_.line = vm.parseUint(in_.line);
     out_.mat = vm.parseUint(in_.mat);
+    if (out_.line == 0) {
+      out_.line = out_.autoLine;
+    }
     out_.name = in_.name;
   }
 
@@ -462,9 +468,7 @@ abstract contract Config is Script {
   }
 }
 
-// string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
 /*
-
 contract TokenList {
   mapping(bytes32 => address) public tokens;
   mapping(bytes32 => uint) public prices;
@@ -482,20 +486,21 @@ contract TokenList {
   }
 
   constructor() {
-    addToken("DAI", GoerlyTokens.DAI, GoerlyTokens.DAI_PRICE);
-    addToken("WETH", GoerlyTokens.ETH, GoerlyTokens.ETH_PRICE);
-    addToken("USDC", GoerlyTokens.USDC, GoerlyTokens.USDC_PRICE);
-    addToken("WBTC", GoerlyTokens.WBTC, GoerlyTokens.WBTC_PRICE);
-    addToken("USDT", GoerlyTokens.USDT, GoerlyTokens.USDT_PRICE);
-    addToken("LINK", GoerlyTokens.LINK, GoerlyTokens.LINK_PRICE);
-    addToken("AAVE", GoerlyTokens.AAVE, GoerlyTokens.AAVE_PRICE);
-    addToken("MATIC", GoerlyTokens.MATIC, GoerlyTokens.MATIC_PRICE);
-    addToken("WSTETH", GoerlyTokens.WSTETH, GoerlyTokens.WSTETH_PRICE);
-    addToken("BAT", GoerlyTokens.BAT, GoerlyTokens.BAT_PRICE);
+    // addToken("DAI", GoerliTokens.DAI, GoerliTokens.DAI_PRICE);
+    // addToken("WETH", GoerliTokens.ETH, GoerliTokens.ETH_PRICE);
+    // addToken("USDC", GoerliTokens.USDC, GoerliTokens.USDC_PRICE);
+    // addToken("WBTC", GoerliTokens.WBTC, GoerliTokens.WBTC_PRICE);
+    // addToken("USDT", GoerliTokens.USDT, GoerliTokens.USDT_PRICE);
+    // addToken("LINK", GoerliTokens.LINK, GoerliTokens.LINK_PRICE);
+    // addToken("AAVE", GoerliTokens.AAVE, GoerliTokens.AAVE_PRICE);
+    // addToken("MATIC", GoerliTokens.MATIC, GoerliTokens.MATIC_PRICE);
+    // addToken("WSTETH", GoerliTokens.WSTETH, GoerliTokens.WSTETH_PRICE);
+    // addToken("BAT", GoerliTokens.BAT, GoerliTokens.BAT_PRICE);
   }
 }
 
-library GoerlyTokens {
+
+library GoerliTokens {
   address public constant DAI = 0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844;
   address public constant ETH = 0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6;
   address public constant USDC = 0x6Fb5ef893d44F4f88026430d82d4ef269543cB23;
