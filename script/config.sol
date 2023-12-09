@@ -114,7 +114,7 @@ abstract contract Config is Script {
   }
 
   struct JoinDeploy {
-    ExtraParam[] extraParams;
+    // ExtraParam[] extraParams;
     string src;
   }
 
@@ -122,21 +122,19 @@ abstract contract Config is Script {
   struct RawToken {
     RawIlk[] ilks;
     Import importx;
-    JoinDeploy joinDeploy;
+    // JoinDeploy joinDeploy;
     string name;
   }
 
   struct Token {
     Ilkx[] ilks;
     Import importx;
-    JoinDeploy joinDeploy;
     string name;
   }
 
   function convToken(RawToken memory in_) public pure returns (Token memory out_) {
     out_.name = in_.name;
     out_.importx = in_.importx;
-    out_.joinDeploy = in_.joinDeploy;
     out_.ilks = new Ilkx[](in_.ilks.length);
     for (uint i = 0; i < in_.ilks.length; i++) {
       out_.ilks[i] = convIlk(in_.ilks[i]);

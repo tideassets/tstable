@@ -57,6 +57,10 @@ contract Authority is DSAuth, DSAuthority {
   function permit(address src, address dst, bytes4 sig) public auth {
     acl[src][dst][sig] = true;
   }
+
+  function forbid(address src, address dst, bytes4 sig) public auth {
+    acl[src][dst][sig] = false;
+  }
 }
 
 contract ProxyActions is DSAuth {
@@ -502,7 +506,7 @@ contract DeploySrcipt is Config {
     // deploy testnet tokens
     deployTestnetTokens();
     // deploy ilks
-    // deployIlks();
+    deployIlks();
 
     admin.setDelay(1 hours);
     vm.stopBroadcast();
@@ -549,7 +553,6 @@ contract DeploySrcipt is Config {
           }
           tokenx.importx = token.importx;
           tokenx.name = token.name;
-          // tokenx.joinDeploy = token.joinDeploy;
         }
       }
     }
@@ -564,39 +567,42 @@ contract DeploySrcipt is Config {
   function deployTestnetTokens() public {
     for (uint i = 0; i < tokenNames.length; i++) {
       bytes32 symbol = tokenNames[i];
+      Token storage tokenx = tokens[symbol];
       DSValue pip = new DSValue();
       if (symbol == "WETH") {
-        tokens[symbol].importx.gem = address(new WETH9_());
+        tokenx.importx.gem = address(new WETH9_());
         pip.poke(bytes32(uint(2200 ether)));
       } else if (symbol == "BAT") {
-        tokens[symbol].importx.gem = address(new BAT(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new BAT(TOKEN_SUPLY));
         pip.poke(bytes32(uint(2 ether)));
       } else if (symbol == "WBTC") {
-        tokens[symbol].importx.gem = address(new WBTC(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new WBTC(TOKEN_SUPLY));
         pip.poke(bytes32(uint(44000 ether)));
       } else if (symbol == "LINK") {
-        tokens[symbol].importx.gem = address(new LINK(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new LINK(TOKEN_SUPLY));
         pip.poke(bytes32(uint(15 ether)));
       } else if (symbol == "AAVE") {
-        tokens[symbol].importx.gem = address(new AAVE(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new AAVE(TOKEN_SUPLY));
         pip.poke(bytes32(uint(100 ether)));
       } else if (symbol == "USDC") {
-        tokens[symbol].importx.gem = address(new USDC(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new USDC(TOKEN_SUPLY));
         pip.poke(bytes32(uint(1 ether)));
       } else if (symbol == "USDT") {
-        tokens[symbol].importx.gem = address(new USDT(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new USDT(TOKEN_SUPLY));
         pip.poke(bytes32(uint(1 ether)));
       } else if (symbol == "UNI") {
-        tokens[symbol].importx.gem = address(new UNI(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new UNI(TOKEN_SUPLY));
         pip.poke(bytes32(uint(16 ether)));
       } else if (symbol == "MATIC") {
-        tokens[symbol].importx.gem = address(new MATIC(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new MATIC(TOKEN_SUPLY));
         pip.poke(bytes32(uint(54 ether)));
       } else if (symbol == "ZRX") {
-        tokens[symbol].importx.gem = address(new ZRX(TOKEN_SUPLY));
+        tokenx.importx.gem = address(new ZRX(TOKEN_SUPLY));
         pip.poke(bytes32(uint(25 ether)));
+      } else {
+        revert("no support");
       }
-      tokens[symbol].importx.pip = address(pip);
+      tokenx.importx.pip = address(pip);
     }
   }
 
