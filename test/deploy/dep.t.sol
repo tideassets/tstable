@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 import "script/deploy.s.sol";
 import {Test, console2, Vm} from "forge-std/Test.sol";
 import {GemJoin} from "../../src/join.sol";
-import {FakeUser} from "./deploy.t.base.sol";
+import {FakeUser} from "dss-deploy/DSSDeploy.t.base.sol";
 import {LinearDecrease} from "../../src/abaci.sol";
 
 contract DeployScriptTest is Test {
@@ -65,8 +65,6 @@ contract DeployBase is Test, ProxyActions {
   End end;
   ESM esm;
 
-  Authority authority;
-
   Flipper ethFlip;
 
   DSToken col;
@@ -92,7 +90,7 @@ contract DeployBase is Test, ProxyActions {
     return wad * 10 ** 27;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     dssDeploy = new DeploySrcipt();
     pipETH = new DSValue();
     pipCOL = new DSValue();
@@ -118,10 +116,11 @@ contract DeployBase is Test, ProxyActions {
     cure = dssDeploy.cure();
     end = dssDeploy.end();
     esm = dssDeploy.esm();
-    pause = dssDeploy.pause();
+
     gov = dssDeploy.gov();
+    pause = dssDeploy.admin().pause();
     authority = dssDeploy.authx();
-    govActions = dssDeploy.govActions();
+    govActions = dssDeploy.admin().govActions();
 
     dssDeploy.govAuth(address(this));
     dssDeploy.pauseAuth(address(this));
@@ -177,6 +176,6 @@ contract DeployBase is Test, ProxyActions {
 
   function deploy() public {
     deployKeepAuth();
-    // dssDeploy.releaseAuth();
+    dssDeploy.releaseAuth();
   }
 }

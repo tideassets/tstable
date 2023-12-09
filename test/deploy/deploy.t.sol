@@ -738,7 +738,7 @@ contract DssDeployTest is DeployBase {
   function testSetPauseAuthority() public {
     deploy();
     assertEq(address(pause.authority()), address(authority));
-    this.setAuthority(address(123));
+    this.setAuth(address(123));
     assertEq(address(pause.authority()), address(123));
   }
 
