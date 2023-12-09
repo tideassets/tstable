@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 import "script/deploy.s.sol";
 import {Test, console2, Vm} from "forge-std/Test.sol";
 import {GemJoin} from "../../src/join.sol";
-import {FakeUser} from "dss-deploy/DSSDeploy.t.base.sol";
+import {FakeUser} from "dss-deploy/DssDeploy.t.base.sol";
 import {LinearDecrease} from "../../src/abaci.sol";
 
 contract DeployScriptTest is Test {
