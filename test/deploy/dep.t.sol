@@ -9,11 +9,11 @@ import {FakeUser} from "dss-deploy/DssDeploy.t.base.sol";
 import {LinearDecrease} from "../../src/abaci.sol";
 
 contract DeployScriptTest is Test {
-  DeploySrcipt public deploy;
+  DeployScript public deploy;
   string json;
 
   function setUp() public {
-    deploy = new DeploySrcipt();
+    deploy = new DeployScript();
     json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
   }
 
@@ -39,7 +39,7 @@ contract DeployScriptTest is Test {
 contract WETH is DSToken("WETH") {}
 
 contract DeployBase is Test, ProxyActions {
-  DeploySrcipt public dssDeploy;
+  DeployScript public dssDeploy;
   WETH weth;
   GemJoin ethJoin;
   GemJoin colJoin;
@@ -91,7 +91,8 @@ contract DeployBase is Test, ProxyActions {
   }
 
   function setUp() public virtual {
-    dssDeploy = new DeploySrcipt();
+    console2.log("DeployBase.setUp");
+    dssDeploy = new DeployScript();
     pipETH = new DSValue();
     pipCOL = new DSValue();
     pipCOL2 = new DSValue();
@@ -152,9 +153,9 @@ contract DeployBase is Test, ProxyActions {
     pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
     pipCOL.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
     pipCOL2.poke(bytes32(uint(30 * 10 ** 18))); // Price 30 DAI = 1 COL2 (precision 18)
-    (ethFlip,,) = dssDeploy.ilks("ETH");
-    (colFlip,,) = dssDeploy.ilks("COL");
-    (, col2Clip,) = dssDeploy.ilks("COL2");
+    (ethFlip,,,,) = dssDeploy.ilks("ETH");
+    (colFlip,,,,) = dssDeploy.ilks("COL");
+    (, col2Clip,,,) = dssDeploy.ilks("COL2");
     this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
     this.file(address(spotter), "COL", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
     this.file(address(spotter), "COL2", "mat", uint(1500000000 ether)); // Liquidation ratio 150%

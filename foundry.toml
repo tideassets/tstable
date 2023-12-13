@@ -16,7 +16,9 @@ int_types = "short"
 
 
 [rpc_endpoints]
-goerli = "${GOERLI_RPC_URL}"
+goerli = "${RPC_URL}"
+arbitrum-sepolia = "${RPC_URL}"
 
 [etherscan]
 goerli = { key = "${ETHERSCAN_API_KEY}" }
+arbitrum-sepolia = { key = "${ETHERSCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api" }

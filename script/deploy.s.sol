@@ -210,7 +210,7 @@ contract Admin is ProxyActions {
   }
 }
 
-contract DeploySrcipt is Config {
+contract DeployScript is Config {
   Vat public vat;
   Jug public jug;
   Vow public vow;
@@ -230,9 +230,12 @@ contract DeploySrcipt is Config {
     Flipper flip;
     Clipper clip;
     address join;
+    address pip;
+    address calc;
   }
 
   mapping(bytes32 => Ilk) public ilks;
+  bytes32[] public ilksNames;
 
   Admin public admin;
   DSPause pause;
@@ -413,6 +416,9 @@ contract DeploySrcipt is Config {
     vat.init(ilk);
     jug.init(ilk);
 
+    ilks[ilk].pip = pip;
+    ilks[ilk].calc = calc;
+
     // Internal auth
     vat.rely(join);
     vat.rely(address(ilks[ilk].clip));
@@ -491,45 +497,6 @@ contract DeploySrcipt is Config {
     ilks[ilk].clip.deny(address(this));
   }
 
-  function run() public {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
-    G memory g = parseConfig(json);
-    initTokens(g.tokens);
-    address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
-    uint chainId = vm.envUint("CHAIN_ID");
-
-    vm.startBroadcast(deployer);
-    // deploy the contract
-    dssDeploy(chainId, WAD * g.global.esm_min);
-    // set param
-    setParam(g.global);
-    // deploy testnet tokens
-    deployTestnetTokens();
-    // deploy ilks
-    deployIlks();
-
-    admin.setDelay(1 hours);
-    vm.stopBroadcast();
-
-    console2.log("deployer", deployer);
-    console2.log("pause", address(pause));
-    console2.log("vat", address(vat));
-    console2.log("daiJoin", address(daiJoin));
-    console2.log("dai", address(dai));
-    console2.log("daiJoin", address(daiJoin));
-    console2.log("dog", address(dog));
-    console2.log("flap", address(flap));
-    console2.log("flop", address(flop));
-    console2.log("jug", address(jug));
-    console2.log("pot", address(pot));
-    console2.log("spotter", address(spotter));
-    console2.log("vow", address(vow));
-    console2.log("end", address(end));
-    console2.log("esm", address(esm));
-    console2.log("gov", address(gov));
-    console2.log("proxyRegistry", address(registry));
-  }
-
   function initTokens(Token[] memory tokens_) public {
     tokenNames.push("WETH");
     tokenNames.push("BAT");
@@ -546,7 +513,7 @@ contract DeploySrcipt is Config {
       Token storage tokenx = tokens[tokenNames[i]];
       for (uint j = 0; j < tokens_.length; j++) {
         Token memory token = tokens_[j];
-        if (tokenNames[i] == bytes32(bytes(tokens_[j].name))) {
+        if (tokenNames[i] == bytes32(bytes(token.name))) {
           for (uint k = 0; k < token.ilks.length; k++) {
             Ilkx memory ilkx = token.ilks[k];
             tokenx.ilks.push(ilkx);
@@ -627,6 +594,7 @@ contract DeploySrcipt is Config {
         calc.file(bytes32("cut"), RAY * ilkx.clipDeploy.calc.cut);
         calc.file(bytes32("step"), ilkx.clipDeploy.calc.step);
         deployCollateralClip(iname, join, token.importx.pip, address(calc));
+        ilksNames.push(iname);
 
         // set ilk
         Ilk memory ilk = ilks[iname];
@@ -680,28 +648,108 @@ contract DeploySrcipt is Config {
     admin.file(address(vow), bytes32("bump"), RAD * g.vow_bump);
     admin.file(address(vow), bytes32("hump"), RAD * g.vow_hump);
   }
+
+  function run() public {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    G memory g = parseConfig(json);
+    initTokens(g.tokens);
+    address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
+    uint chainId = vm.envUint("CHAIN_ID");
+
+    vm.startBroadcast(deployer);
+    // deploy the contract
+    dssDeploy(chainId, WAD * g.global.esm_min);
+    // set param
+    setParam(g.global);
+    // deploy testnet tokens
+    deployTestnetTokens();
+    // deploy ilks
+    deployIlks();
+
+    gov.mint(1000 ether);
+    admin.setDelay(10 seconds);
+    vm.stopBroadcast();
+
+    console2.log("vat", address(vat));
+    console2.log("daiJoin", address(daiJoin));
+    console2.log("dai", address(dai));
+    console2.log("dog", address(dog));
+    console2.log("cat", address(cat));
+    console2.log("cure", address(cure));
+    console2.log("flap", address(flap));
+    console2.log("flop", address(flop));
+    console2.log("jug", address(jug));
+    console2.log("pot", address(pot));
+    console2.log("spotter", address(spotter));
+    console2.log("vow", address(vow));
+    console2.log("end", address(end));
+    console2.log("esm", address(esm));
+
+    console2.log("--------------------------");
+    console2.log("gov", address(gov));
+    console2.log("admin", address(admin));
+    console2.log("pause", address(pause));
+    console2.log("proxyRegistry", address(registry));
+
+    console2.log("--------------------------");
+    console2.log("deployer", deployer);
+
+    console2.log("--------------------------");
+    for (uint i = 0; i < tokenNames.length; i++) {
+      bytes32 name = tokenNames[i];
+      string memory sname = bytes32ToString(tokenNames[i]);
+      console2.log("--------------------------");
+      console2.log(sname, address(tokens[name].importx.gem));
+      console2.log(sname, "pip", address(tokens[name].importx.pip));
+    }
+  }
+
+  function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
+    uint8 i = 0;
+    while (i < 32 && _bytes32[i] != 0) {
+      i++;
+    }
+    bytes memory bytesArray = new bytes(i);
+    for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
+      bytesArray[i] = _bytes32[i];
+    }
+    return string(bytesArray);
+  }
 }
 
-contract Deploy is Script {
-  function run() public payable {
-    DeploySrcipt script = new DeploySrcipt();
-    script.run();
+contract DeployTest is Script, Config {
+  bytes32[] ilk_names;
 
-    // console2.log("pause", address(script.pause()));
-    console2.log("vat", address(script.vat()));
-    console2.log("daiJoin", address(script.daiJoin()));
-    console2.log("dai", address(script.dai()));
-    console2.log("daiJoin", address(script.daiJoin()));
-    console2.log("dog", address(script.dog()));
-    console2.log("flap", address(script.flap()));
-    console2.log("flop", address(script.flop()));
-    console2.log("jug", address(script.jug()));
-    console2.log("pot", address(script.pot()));
-    console2.log("spotter", address(script.spotter()));
-    console2.log("vow", address(script.vow()));
-    console2.log("end", address(script.end()));
-    console2.log("esm", address(script.esm()));
-    console2.log("gov", address(script.gov()));
-    console2.log("proxyRegistry", address(script.registry()));
+  function run() public payable {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    G memory g = parseConfig(json);
+
+    string[10] memory token_names =
+      ["WETH", "BAT", "WBTC", "LINK", "AAVE", "USDC", "USDT", "UNI", "MATIC", "ZRX"];
+
+    Token[] memory tokens_ = g.tokens;
+    for (uint i = 0; i < token_names.length; i++) {
+      for (uint j = 0; j < tokens_.length; j++) {
+        Token memory token = tokens_[j];
+        if (bytes32(bytes(token_names[i])) == bytes32(bytes(token.name))) {
+          for (uint k = 0; k < token.ilks.length; k++) {
+            Ilkx memory ilkx = token.ilks[k];
+            bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
+            ilk_names.push(iname);
+          }
+        }
+      }
+    }
+
+    address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
+
+    vm.startBroadcast(deployer);
+
+    // deploy the contract
+    DSToken gov = new DSToken("xxx");
+
+    vm.stopBroadcast();
+
+    console2.log("x.address", address(gov));
   }
 }

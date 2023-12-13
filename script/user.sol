@@ -4,7 +4,9 @@
 pragma solidity ^0.8.20;
 
 import "dss-proxy-actions/DssProxyActions.sol";
-import {ProxyRegistry, DSProxyFactory, DSProxy} from "proxy-registry/ProxyRegistry.sol";
+import {
+  ProxyRegistry, DSProxyFactory, DSProxy, DSProxyCache
+} from "proxy-registry/ProxyRegistry.sol";
 
 abstract contract ProxyCalls {
   DSProxy public proxy;
@@ -280,8 +282,9 @@ abstract contract ProxyCalls {
   }
 }
 
-abstract contract ProxyUser is ProxyCalls {
-  constructor() {
+contract ProxyUser is ProxyCalls, DSProxy {
+  constructor() DSProxy(address(new DSProxyCache())) {
+    proxy = DSProxy(payable(address(this)));
     dssProxyActions = address(new DssProxyActions());
     dssProxyActionsEnd = address(new DssProxyActionsEnd());
     dssProxyActionsDsr = address(new DssProxyActionsDsr());

@@ -37,6 +37,8 @@ contract ProxyUserTest is DeployBase, ProxyUser {
 
   ProxyRegistry registry;
   Admin admin;
+  ProxyUser u1;
+  ProxyUser u2;
 
   function setUp() public override {
     super.setUp();
@@ -56,7 +58,7 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
     pipDGD = new DSValue();
     dssDeploy.deployCollateralFlip("DGD", address(dgdJoin), address(pipDGD));
-    (dgdFlip,,) = dssDeploy.ilks("DGD");
+    (dgdFlip,,,,) = dssDeploy.ilks("DGD");
     pipDGD.poke(bytes32(uint(50 ether))); // Price 50 DAI = 1 DGD (in precision 18)
     admin.file(address(spotter), "DGD", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
     admin.file(address(vat), bytes32("DGD"), bytes32("line"), uint(10000 * 10 ** 45));
@@ -70,7 +72,7 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     LinearDecrease calcGNT = new LinearDecrease();
     calcGNT.file(bytes32("tau"), 1 hours);
     dssDeploy.deployCollateralClip("GNT", address(gntJoin), address(pipGNT), address(calcGNT));
-    (, clipGNT,) = dssDeploy.ilks("GNT");
+    (, clipGNT,,,) = dssDeploy.ilks("GNT");
     pipGNT.poke(bytes32(uint(100 ether))); // Price 100 DAI = 1 GNT
     admin.file(address(spotter), "GNT", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
     admin.file(address(vat), bytes32("GNT"), bytes32("line"), uint(10000 * 10 ** 45));
@@ -80,7 +82,9 @@ contract ProxyUserTest is DeployBase, ProxyUser {
 
     manager = new DssCdpManager(address(vat));
     registry = dssDeploy.registry();
-    proxy = DSProxy(payable(registry.build()));
+    // proxy = DSProxy(payable(registry.build()));
+    u1 = new ProxyUser();
+    u2 = new ProxyUser();
   }
 
   function ink(bytes32 ilk, address urn) public view returns (uint inkV) {
@@ -101,10 +105,42 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     assertEq(col.balanceOf(address(123)), 4);
   }
 
+  function testTransfer1() public {
+    col.mint(10);
+    col.transfer(address(u1), 10);
+    assertEq(col.balanceOf(address(u1)), 10);
+    assertEq(col.balanceOf(address(123)), 0);
+    u1.transfer(address(col), address(123), 4);
+    assertEq(col.balanceOf(address(u1)), 6);
+    assertEq(col.balanceOf(address(123)), 4);
+  }
+
+  function testTransfer2() public {
+    col.mint(10);
+    col.transfer(address(u2), 10);
+    assertEq(col.balanceOf(address(u2)), 10);
+    assertEq(col.balanceOf(address(123)), 0);
+    u2.transfer(address(col), address(123), 4);
+    assertEq(col.balanceOf(address(u2)), 6);
+    assertEq(col.balanceOf(address(123)), 4);
+  }
+
   function testCreateCDP() public {
     uint cdp = this.open(address(manager), "ETH", address(proxy));
     assertEq(cdp, 1);
     assertEq(manager.owns(cdp), address(proxy));
+  }
+
+  function testCreateCDP1() public {
+    uint cdp = u1.open(address(manager), "ETH", address(u1));
+    assertEq(cdp, 1);
+    assertEq(manager.owns(cdp), address(u1));
+  }
+
+  function testCreateCDP2() public {
+    uint cdp = u2.open(address(manager), "ETH", address(u2));
+    assertEq(cdp, 1);
+    assertEq(manager.owns(cdp), address(u2));
   }
 
   function testGiveCDP() public {
@@ -1123,5 +1159,5 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     assertEq(dai.balanceOf(address(this)), 50 ether);
   }
 
-  receive() external payable {}
+  // receive() external payable {}
 }
