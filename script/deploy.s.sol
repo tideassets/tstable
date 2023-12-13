@@ -504,23 +504,39 @@ contract DeployScript is Config {
     end.file("wait", 0);
   }
 
-  function run() public {
+  uint CHAIN_ID;
+  Global gl;
+
+  function _run() internal virtual {
+    // deploy the contract
+    dssDeploy(CHAIN_ID, WAD * gl.esm_min);
+    // set param
+    setParam(gl);
+
+    pauseAuth(address(this));
+    gov.mint(1000 ether);
+
+    Admin admin = new Admin(address(pause));
+    pauseAuth(address(admin));
+    admin.setDelay(0);
+    end.file("wait", 0);
+  }
+
+  function _before() internal virtual {
     string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
     G memory g = parseConfig(json);
+    gl = g.global;
+
     initTokens(g.tokens);
+    CHAIN_ID = vm.envUint("CHAIN_ID");
+  }
+
+  function run() public {
+    _before();
     address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
-    uint chainId = vm.envUint("CHAIN_ID");
 
     vm.startBroadcast(deployer);
-    // deploy the contract
-    dssDeploy(chainId, WAD * g.global.esm_min);
-    // set param
-    setParam(g.global);
-
-    // // deploy testnet tokens
-    // deployTestnetTokens();
-    // // deploy ilks
-    // deployIlks();
+    _run();
 
     pauseAuth(deployer);
     gov.mint(1000 ether);
@@ -530,39 +546,6 @@ contract DeployScript is Config {
     admin.setDelay(10 seconds);
 
     vm.stopBroadcast();
-
-    console2.log("vat", address(vat));
-    console2.log("daiJoin", address(daiJoin));
-    console2.log("dai", address(dai));
-    console2.log("dog", address(dog));
-    console2.log("cat", address(cat));
-    console2.log("cure", address(cure));
-    console2.log("flap", address(flap));
-    console2.log("flop", address(flop));
-    console2.log("jug", address(jug));
-    console2.log("pot", address(pot));
-    console2.log("spotter", address(spotter));
-    console2.log("vow", address(vow));
-    console2.log("end", address(end));
-    console2.log("esm", address(esm));
-
-    console2.log("--------------------------");
-    console2.log("gov", address(gov));
-    console2.log("this", address(this));
-    console2.log("pause", address(pause));
-    console2.log("proxyRegistry", address(registry));
-
-    console2.log("--------------------------");
-    console2.log("deployer", deployer);
-
-    console2.log("--------------------------");
-    for (uint i = 0; i < tokenNames.length; i++) {
-      bytes32 name = tokenNames[i];
-      string memory sname = bytes32ToString(tokenNames[i]);
-      console2.log("--------------------------");
-      console2.log(sname, address(tokens[name].importx.gem));
-      console2.log(sname, "pip", address(tokens[name].importx.pip));
-    }
   }
 
   function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
@@ -578,39 +561,50 @@ contract DeployScript is Config {
   }
 }
 
-contract DeployTest is Script, Config {
+contract Deploy2 is DeployScript {
   bytes32[] ilk_names;
 
-  function run() public payable {
-    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
-    G memory g = parseConfig(json);
+  struct AddrInfo {
+    address addr;
+    string name;
+  }
 
-    string[10] memory token_names =
-      ["WETH", "BAT", "WBTC", "LINK", "AAVE", "USDC", "USDT", "UNI", "MATIC", "ZRX"];
+  mapping(string => address) addrs;
 
-    Token[] memory tokens_ = g.tokens;
-    for (uint i = 0; i < token_names.length; i++) {
-      for (uint j = 0; j < tokens_.length; j++) {
-        Token memory token = tokens_[j];
-        if (bytes32(bytes(token_names[i])) == bytes32(bytes(token.name))) {
-          for (uint k = 0; k < token.ilks.length; k++) {
-            Ilkx memory ilkx = token.ilks[k];
-            bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
-            ilk_names.push(iname);
-          }
-        }
-      }
+  function _before() internal override {
+    super._before();
+
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/421614.json"));
+    bytes memory jsonBytes = vm.parseJson(json);
+    AddrInfo[] memory addrs_ = abi.decode(jsonBytes, (AddrInfo[]));
+    for (uint i = 0; i < addrs_.length; i++) {
+      AddrInfo memory addr = addrs_[i];
+      addrs[addr.name] = addr.addr;
     }
+    vat = Vat(addrs["Vat"]);
+    spotter = Spotter(addrs["Spotter"]);
+    jug = Jug(addrs["Jug"]);
+    vow = Vow(addrs["Vow"]);
+    cat = Cat(addrs["Cat"]);
+    dog = Dog(addrs["Dog"]);
+    dai = Dai(addrs["Dai"]);
+    daiJoin = DaiJoin(addrs["DaiJoin"]);
+    flap = Flapper(addrs["Flapper"]);
+    flop = Flopper(addrs["Flopper"]);
+    pot = Pot(addrs["Pot"]);
+    cure = Cure(addrs["Cure"]);
+    end = End(addrs["End"]);
+    esm = ESM(addrs["ESM"]);
+    pause = DSPause(addrs["Pause"]);
+    gov = DSToken(addrs["Gov"]);
+    registry = ProxyRegistry(addrs["ProxyRegistry"]);
+    // Admin admin = Admin(addrs["Admin"]);
+  }
 
-    address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
-
-    vm.startBroadcast(deployer);
-
-    // deploy the contract
-    DSToken gov = new DSToken("xxx");
-
-    vm.stopBroadcast();
-
-    console2.log("x.address", address(gov));
+  function _run() internal override {
+    // deploy testnet tokens
+    deployTestnetTokens();
+    // deploy ilks
+    deployIlks();
   }
 }
