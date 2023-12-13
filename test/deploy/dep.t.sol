@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.13;
 
 import "script/deploy.s.sol";
 import {Test, console2, Vm} from "forge-std/Test.sol";
-import {GemJoin} from "../../src/join.sol";
 import {FakeUser} from "dss-deploy/DssDeploy.t.base.sol";
-import {LinearDecrease} from "../../src/abaci.sol";
+import {GemJoin} from "src/join.sol";
+import {LinearDecrease} from "src/abaci.sol";
+import {ProxyActions, Admin} from "script/admin.sol";
 
 contract DeployScriptTest is Test {
   DeployScript public deploy;
@@ -102,7 +103,8 @@ contract DeployBase is Test, ProxyActions {
   }
 
   function _dssDeploy() internal {
-    dssDeploy.dssDeploy(99, 10);
+    dssDeploy.setup();
+    // dssDeploy.dssDeploy(99, 10);
     vat = dssDeploy.vat();
     jug = dssDeploy.jug();
     vow = dssDeploy.vow();
@@ -119,9 +121,9 @@ contract DeployBase is Test, ProxyActions {
     esm = dssDeploy.esm();
 
     gov = dssDeploy.gov();
-    pause = dssDeploy.admin().pause();
+    pause = dssDeploy.pause();
     authority = dssDeploy.authx();
-    govActions = dssDeploy.admin().govActions();
+    govActions = new GovActions();
 
     dssDeploy.govAuth(address(this));
     dssDeploy.pauseAuth(address(this));

@@ -32,11 +32,11 @@ abstract contract Config is Script {
     RawCalc calc;
     string chip;
     string chop;
+    string cm_tolerance;
     string cusp;
     string hole;
     string tail;
     string tip;
-    string cm_tolerance;
   }
 
   struct ClipDeploy {
@@ -114,7 +114,7 @@ abstract contract Config is Script {
   }
 
   struct JoinDeploy {
-    // ExtraParam[] extraParams;
+    ExtraParam[] extraParams;
     string src;
   }
 
@@ -122,7 +122,7 @@ abstract contract Config is Script {
   struct RawToken {
     RawIlk[] ilks;
     Import importx;
-    // JoinDeploy joinDeploy;
+    JoinDeploy joinDeploy;
     string name;
   }
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
 import {DSToken} from "ds-token/token.sol";
@@ -9,12 +9,6 @@ import {PipLike} from "../src/spot.sol";
 import {Config} from "./config.sol";
 import {DSPause} from "ds-pause/pause.sol";
 import {GovActions} from "dss-deploy/govActions.sol";
-import {ProxyCalls} from "dss-proxy-actions/DssProxyActions.t.sol";
-import {
-  DssProxyActions,
-  DssProxyActionsEnd,
-  DssProxyActionsDsr
-} from "dss-proxy-actions/DssProxyActions.sol";
 import {ProxyRegistry, DSProxyFactory, DSProxy} from "proxy-registry/ProxyRegistry.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
 import {BAT} from "dss-gem-joins/tokens/BAT.sol";
@@ -46,169 +40,7 @@ import {End} from "src/end.sol";
 import {ESM} from "esm/ESM.sol";
 import {Pot} from "src/pot.sol";
 import {Spotter} from "src/spot.sol";
-
-contract Authority is DSAuth, DSAuthority {
-  mapping(address => mapping(address => mapping(bytes4 => bool))) acl;
-
-  function canCall(address src, address dst, bytes4 sig) external view returns (bool) {
-    return acl[src][dst][sig];
-  }
-
-  function permit(address src, address dst, bytes4 sig) public auth {
-    acl[src][dst][sig] = true;
-  }
-
-  function forbid(address src, address dst, bytes4 sig) public auth {
-    acl[src][dst][sig] = false;
-  }
-}
-
-contract ProxyActions is DSAuth {
-  DSPause public pause;
-  GovActions public govActions;
-
-  function rely(address from, address to) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function deny(address from, address to) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function file(address who, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function file(address who, bytes32 ilk, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function dripAndFile(address who, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function cage(address end) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("cage(address)", end);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setAuth(address newAuthority) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setDelay(uint newDelay) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-
-  function setAuthorityAndDelay(address newAuthority, uint newDelay) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature(
-      "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
-    );
-    uint eta = block.timestamp;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
-  }
-}
-
-contract Admin is ProxyActions {
-  constructor(address pause_) {
-    pause = DSPause(pause_);
-    govActions = new GovActions();
-  }
-}
+import {Authority, Admin} from "./admin.sol";
 
 contract DeployScript is Config {
   Vat public vat;
@@ -235,10 +67,8 @@ contract DeployScript is Config {
   }
 
   mapping(bytes32 => Ilk) public ilks;
-  bytes32[] public ilksNames;
 
-  Admin public admin;
-  DSPause pause;
+  DSPause public pause;
 
   DSToken public gov;
   ProxyRegistry public registry;
@@ -463,12 +293,13 @@ contract DeployScript is Config {
     deployAuctions(address(gov));
     deployLiquidator();
     deployEnd();
-    deployPause(0, address(new Authority()));
+    Authority au = new Authority();
+    deployPause(0, address(au));
     deployESM(address(gov), minGov);
 
     // set pause auth
-    admin = new Admin(address(pause));
-    pauseAuth(address(admin));
+    // this = new Admin(address(pause));
+    // pauseAuth(address(this));
 
     // create registry
     registry = new ProxyRegistry(address(new DSProxyFactory()));
@@ -498,12 +329,12 @@ contract DeployScript is Config {
   }
 
   function initTokens(Token[] memory tokens_) public {
-    tokenNames.push("WETH");
-    tokenNames.push("BAT");
-    tokenNames.push("WBTC");
+    tokenNames.push("ETH");
+    tokenNames.push("USDC");
     tokenNames.push("LINK");
     tokenNames.push("AAVE");
-    tokenNames.push("USDC");
+    tokenNames.push("WBTC");
+    tokenNames.push("BAT");
     tokenNames.push("USDT");
     tokenNames.push("UNI");
     tokenNames.push("MATIC");
@@ -536,7 +367,7 @@ contract DeployScript is Config {
       bytes32 symbol = tokenNames[i];
       Token storage tokenx = tokens[symbol];
       DSValue pip = new DSValue();
-      if (symbol == "WETH") {
+      if (symbol == "ETH") {
         tokenx.importx.gem = address(new WETH9_());
         pip.poke(bytes32(uint(2200 ether)));
       } else if (symbol == "BAT") {
@@ -594,59 +425,83 @@ contract DeployScript is Config {
         calc.file(bytes32("cut"), RAY * ilkx.clipDeploy.calc.cut);
         calc.file(bytes32("step"), ilkx.clipDeploy.calc.step);
         deployCollateralClip(iname, join, token.importx.pip, address(calc));
-        ilksNames.push(iname);
 
         // set ilk
         Ilk memory ilk = ilks[iname];
         // vat
-        admin.file(address(vat), iname, bytes32("line"), RAD * ilkx.line);
-        admin.file(address(vat), iname, bytes32("dust"), RAD * ilkx.dust);
+        vat.file(iname, bytes32("line"), RAD * ilkx.line);
+        vat.file(iname, bytes32("dust"), RAD * ilkx.dust);
         // jug
-        admin.file(address(jug), iname, bytes32("duty"), RAY * ilkx.duty / PENCENT_DIVIDER);
+        // jug.file(iname, bytes32("duty"), WAD * ilkx.duty / PENCENT_DIVIDER);
         // spotter
-        admin.file(address(spotter), iname, bytes32("mat"), RAY * ilkx.mat / PENCENT_DIVIDER);
+        spotter.file(iname, bytes32("mat"), WAD * ilkx.mat / PENCENT_DIVIDER);
         // dog
-        admin.file(address(dog), iname, bytes32("hole"), RAD * ilkx.clipDeploy.hole);
-        admin.file(address(dog), iname, bytes32("chop"), WAD * ilkx.clipDeploy.chop);
+        dog.file(iname, bytes32("hole"), RAD * ilkx.clipDeploy.hole);
+        dog.file(iname, bytes32("chop"), WAD * ilkx.clipDeploy.chop);
         // clip
-        admin.file(address(ilk.clip), bytes32("buf"), RAY * ilkx.clipDeploy.buf / PENCENT_DIVIDER);
-        admin.file(address(ilk.clip), bytes32("tail"), ilkx.clipDeploy.tail);
-        admin.file(address(ilk.clip), bytes32("cusp"), RAY * ilkx.clipDeploy.cusp);
-        admin.file(address(ilk.clip), bytes32("chip"), WAD * ilkx.clipDeploy.chip / PENCENT_DIVIDER);
-        admin.file(address(ilk.clip), bytes32("tip"), RAY * ilkx.clipDeploy.tip);
+        ilk.clip.file(bytes32("buf"), WAD * ilkx.clipDeploy.buf / PENCENT_DIVIDER);
+        ilk.clip.file(bytes32("tail"), ilkx.clipDeploy.tail);
+        ilk.clip.file(bytes32("cusp"), WAD * ilkx.clipDeploy.cusp / PENCENT_DIVIDER);
+        ilk.clip.file(bytes32("chip"), WAD * ilkx.clipDeploy.chip / PENCENT_DIVIDER);
+        ilk.clip.file(bytes32("tip"), WAD * ilkx.clipDeploy.tip);
       }
     }
   }
 
   function setParam(Global memory g) public {
     // vat
-    admin.file(address(vat), bytes32("Line"), RAD * g.vat_line);
+    vat.file(bytes32("Line"), RAD * g.vat_line);
     // dog
-    admin.file(address(dog), bytes32("Hole"), RAD * g.dog_hole);
+    dog.file(bytes32("Hole"), RAD * g.dog_hole);
     // cure
-    admin.file(address(cure), bytes32("wait"), RAD * g.cure_wait);
+    cure.file(bytes32("wait"), RAD * g.cure_wait);
     // end
-    admin.file(address(end), bytes32("wait"), g.end_wait);
+    end.file(bytes32("wait"), g.end_wait);
     // flap
-    admin.file(address(flap), bytes32("beg"), WAD * g.flap_beg / PENCENT_DIVIDER);
-    admin.file(address(flap), bytes32("ttl"), g.flap_ttl);
-    admin.file(address(flap), bytes32("tau"), g.flap_tau);
-    admin.file(address(flap), bytes32("lid"), RAD * g.flap_lid);
+    flap.file(bytes32("beg"), WAD * g.flap_beg / PENCENT_DIVIDER);
+    flap.file(bytes32("ttl"), g.flap_ttl);
+    flap.file(bytes32("tau"), g.flap_tau);
+    flap.file(bytes32("lid"), RAD * g.flap_lid);
     // flop
-    admin.file(address(flop), bytes32("beg"), WAD * g.flop_beg / PENCENT_DIVIDER);
-    admin.file(address(flop), bytes32("ttl"), g.flop_ttl);
-    admin.file(address(flop), bytes32("tau"), g.flop_tau);
-    admin.file(address(flop), bytes32("pad"), WAD * g.flop_pad / PENCENT_DIVIDER);
+    flop.file(bytes32("beg"), WAD * g.flop_beg / PENCENT_DIVIDER);
+    flop.file(bytes32("ttl"), g.flop_ttl);
+    flop.file(bytes32("tau"), g.flop_tau);
+    flop.file(bytes32("pad"), WAD * g.flop_pad / PENCENT_DIVIDER);
     // jug
-    admin.file(address(jug), bytes32("base"), RAY * g.jug_base / PENCENT_DIVIDER);
+    jug.file(bytes32("base"), WAD * g.jug_base / PENCENT_DIVIDER);
     // pot
-    admin.file(address(pot), bytes32("dsr"), RAY * g.pot_dsr / PENCENT_DIVIDER);
+    // pot.file(bytes32("dsr"), WAD * g.pot_dsr / PENCENT_DIVIDER);
     // vow
-    admin.file(address(vow), bytes32("wait"), g.vow_wait);
-    admin.file(address(vow), bytes32("dump"), WAD * g.vow_dump);
-    admin.file(address(vow), bytes32("sump"), RAD * g.vow_sump);
-    admin.file(address(vow), bytes32("bump"), RAD * g.vow_bump);
-    admin.file(address(vow), bytes32("hump"), RAD * g.vow_hump);
+    vow.file(bytes32("wait"), g.vow_wait);
+    vow.file(bytes32("dump"), WAD * g.vow_dump);
+    vow.file(bytes32("sump"), RAD * g.vow_sump);
+    vow.file(bytes32("bump"), RAD * g.vow_bump);
+    vow.file(bytes32("hump"), RAD * g.vow_hump);
+  }
+
+  function setup() public {
+    string memory json = vm.readFile(string.concat(vm.projectRoot(), "/script/config/config.json"));
+    G memory g = parseConfig(json);
+    initTokens(g.tokens);
+    uint chainId = vm.envUint("CHAIN_ID");
+
+    // deploy the contract
+    dssDeploy(chainId, WAD * g.global.esm_min);
+    // set param
+    setParam(g.global);
+
+    // deploy testnet tokens
+    deployTestnetTokens();
+    // deploy ilks
+    deployIlks();
+
+    pauseAuth(address(this));
+    gov.mint(1000 ether);
+
+    Admin admin = new Admin(address(pause));
+    pauseAuth(address(admin));
+    admin.setDelay(0);
+    end.file("wait", 0);
   }
 
   function run() public {
@@ -661,13 +516,19 @@ contract DeployScript is Config {
     dssDeploy(chainId, WAD * g.global.esm_min);
     // set param
     setParam(g.global);
-    // deploy testnet tokens
-    deployTestnetTokens();
-    // deploy ilks
-    deployIlks();
 
+    // // deploy testnet tokens
+    // deployTestnetTokens();
+    // // deploy ilks
+    // deployIlks();
+
+    pauseAuth(deployer);
     gov.mint(1000 ether);
+
+    Admin admin = new Admin(address(pause));
+    pauseAuth(address(admin));
     admin.setDelay(10 seconds);
+
     vm.stopBroadcast();
 
     console2.log("vat", address(vat));
@@ -687,7 +548,7 @@ contract DeployScript is Config {
 
     console2.log("--------------------------");
     console2.log("gov", address(gov));
-    console2.log("admin", address(admin));
+    console2.log("this", address(this));
     console2.log("pause", address(pause));
     console2.log("proxyRegistry", address(registry));
 

@@ -11,7 +11,7 @@ import {DssCdpManager} from "dss-cdp-manager/DssCdpManager.sol";
 import {GetCdps} from "dss-cdp-manager/GetCdps.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
 import {LinearDecrease} from "src/abaci.sol";
-import {DeployBase, DSProxy, Admin, GemJoin, ProxyRegistry} from "./dep.t.sol";
+import {DeployBase, DSProxy, GemJoin, ProxyRegistry, Admin} from "./dep.t.sol";
 import {Flipper} from "src/flip.sol";
 import {Clipper} from "src/clip.sol";
 import {ProxyUser} from "script/user.sol";
@@ -44,7 +44,7 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     super.setUp();
     deployKeepAuth();
 
-    admin = new Admin(address(dssDeploy.admin().pause()));
+    admin = new Admin(address(dssDeploy.pause()));
     dssDeploy.pauseAuth(address(admin));
 
     // Create a real WETH token and replace it with a new adapter in the vat

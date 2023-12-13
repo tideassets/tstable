@@ -7,6 +7,7 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 
 optimizer = true
 optimizer_runs = 1000000
+--compiler-version = "v0.8.23+commit.f704f362"
 # yul = false
 
 [fmt]
