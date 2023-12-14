@@ -5,7 +5,6 @@ import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSPause} from "ds-pause/pause.sol";
 import {GovActions} from "dss-deploy/govActions.sol";
 
-
 contract Authority is DSAuth, DSAuthority {
   mapping(address => mapping(address => mapping(bytes4 => bool))) acl;
 
@@ -25,6 +24,7 @@ contract Authority is DSAuth, DSAuthority {
 contract ProxyActions is DSAuth {
   DSPause public pause;
   GovActions public govActions;
+  uint delay;
 
   function rely(address from, address to) external auth {
     address usr = address(govActions);
@@ -33,7 +33,7 @@ contract ProxyActions is DSAuth {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -46,7 +46,7 @@ contract ProxyActions is DSAuth {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -59,7 +59,7 @@ contract ProxyActions is DSAuth {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -73,7 +73,7 @@ contract ProxyActions is DSAuth {
     }
     bytes memory fax =
       abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -87,7 +87,7 @@ contract ProxyActions is DSAuth {
     }
     bytes memory fax =
       abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -101,7 +101,7 @@ contract ProxyActions is DSAuth {
     }
     bytes memory fax =
       abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -114,7 +114,7 @@ contract ProxyActions is DSAuth {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("cage(address)", end);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -127,20 +127,20 @@ contract ProxyActions is DSAuth {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
   }
 
-  function setDelay(uint newDelay) external auth {
+  function setDelay(uint newDelay) public auth {
     address usr = address(govActions);
     bytes32 tag;
     assembly {
       tag := extcodehash(usr)
     }
     bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -155,7 +155,7 @@ contract ProxyActions is DSAuth {
     bytes memory fax = abi.encodeWithSignature(
       "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
     );
-    uint eta = block.timestamp;
+    uint eta = block.timestamp + delay;
 
     pause.plot(usr, tag, fax, eta);
     pause.exec(usr, tag, fax, eta);
@@ -163,8 +163,29 @@ contract ProxyActions is DSAuth {
 }
 
 contract Admin is ProxyActions {
+  uint public pauseEta;
+
   constructor(address pause_) {
+    delay = 10;
     pause = DSPause(pause_);
     govActions = new GovActions();
+  }
+
+  function changeDelay(uint newDelay, bool exec) external auth {
+    address usr = address(govActions);
+    bytes32 tag;
+    assembly {
+      tag := extcodehash(usr)
+    }
+    bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
+    uint eta = block.timestamp + delay;
+
+    if (!exec) {
+      pauseEta = eta;
+      pause.plot(usr, tag, fax, eta);
+    } else {
+      pause.exec(usr, tag, fax, pauseEta);
+    }
+    delay = newDelay;
   }
 }

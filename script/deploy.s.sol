@@ -513,13 +513,10 @@ contract DeployScript is Config {
     // set param
     setParam(gl);
 
-    pauseAuth(address(this));
     gov.mint(1000 ether);
 
     Admin admin = new Admin(address(pause));
     pauseAuth(address(admin));
-    admin.setDelay(0);
-    end.file("wait", 0);
   }
 
   function _before() internal virtual {
@@ -536,14 +533,8 @@ contract DeployScript is Config {
     address deployer = vm.rememberKey(vm.envUint("PRIVATE_KEY"));
 
     vm.startBroadcast(deployer);
+
     _run();
-
-    pauseAuth(deployer);
-    gov.mint(1000 ether);
-
-    Admin admin = new Admin(address(pause));
-    pauseAuth(address(admin));
-    admin.setDelay(10 seconds);
 
     vm.stopBroadcast();
   }
@@ -561,8 +552,13 @@ contract DeployScript is Config {
   }
 }
 
+interface OldAdmin {
+  function setDelay(uint newDelay) external;
+}
+
 contract Deploy2 is DeployScript {
   bytes32[] ilk_names;
+  address oldAdmin;
 
   struct AddrInfo {
     address addr;
@@ -595,10 +591,34 @@ contract Deploy2 is DeployScript {
     cure = Cure(addrs["Cure"]);
     end = End(addrs["End"]);
     esm = ESM(addrs["ESM"]);
-    pause = DSPause(addrs["Pause"]);
-    gov = DSToken(addrs["Gov"]);
+    pause = DSPause(addrs["DSPause"]);
+    gov = DSToken(addrs["DSToken"]);
     registry = ProxyRegistry(addrs["ProxyRegistry"]);
-    // Admin admin = Admin(addrs["Admin"]);
+    oldAdmin = addrs["Admin"];
+    console2.log("vat", address(vat));
+    console2.log("spotter", address(spotter));
+    console2.log("jug", address(jug));
+    console2.log("vow", address(vow));
+    console2.log("cat", address(cat));
+    console2.log("dog", address(dog));
+    console2.log("dai", address(dai));
+    console2.log("daiJoin", address(daiJoin));
+    console2.log("flap", address(flap));
+    console2.log("flop", address(flop));
+    console2.log("pot", address(pot));
+    console2.log("cure", address(cure));
+    console2.log("end", address(end));
+    console2.log("esm", address(esm));
+    console2.log("gov", address(gov));
+    console2.log("registry", address(registry));
+    console2.log("pause", address(pause));
+    console2.log("oldAdmin", oldAdmin);
+  }
+
+  function _onlyTry() internal {
+    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
+    admin.changeDelay(0, true);
+    // OldAdmin(oldAdmin).setDelay(1);
   }
 
   function _run() internal override {

@@ -26,12 +26,14 @@ const contracts = createTransactions.map((transaction) => ({
 // 解析 JSON 数据
 // const contracts = JSON.parse(data);
 
-// 根据类型生成 abi-encode 命令
+// /// 根据类型生成 abi-encode 命令
 function generateAbiEncodeCommand(argv) {
   const types = argv
     .map((arg) => {
-      if (/^0x/.test(arg)) {
+      if (arg.length === 42) {
         return "address";
+      } else if (arg.length === 66) {
+        return "bytes32";
       } else if (/^\d+$/.test(arg)) {
         return "uint256";
       } else {
@@ -44,7 +46,6 @@ function generateAbiEncodeCommand(argv) {
 
   return `"constructor(${types})" ${values}`;
 }
-
 // 循环处理每个合约
 contracts.forEach((contract) => {
   // 构造命令
