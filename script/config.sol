@@ -470,6 +470,7 @@ abstract contract Config is Script {
     uint result = 0;
     bool hasDot = false;
     uint decimalPlaces = 2; // 默认小数点后有两位
+
     for (; i < b.length; i++) {
       uint8 tempByte = uint8(b[i]);
       if (tempByte >= 48 && tempByte <= 57) {
@@ -486,9 +487,17 @@ abstract contract Config is Script {
         revert("Invalid character in string!");
       }
     }
-    for (; decimalPlaces > 0; decimalPlaces--) {
-      result *= 10;
+
+    // 如果没有小数点，那么将结果乘以 100
+    if (!hasDot) {
+      result *= 100;
+    } else {
+      // 如果有小数点，但小数位少于 2 位，那么将结果乘以 10 的相应次数
+      for (; decimalPlaces > 0; decimalPlaces--) {
+        result *= 10;
+      }
     }
+
     return result;
   }
 }

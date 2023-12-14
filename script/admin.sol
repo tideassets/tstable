@@ -166,7 +166,7 @@ contract Admin is ProxyActions {
   uint public pauseEta;
 
   constructor(address pause_) {
-    delay = 10;
+    // delay = 10;
     pause = DSPause(pause_);
     govActions = new GovActions();
   }

@@ -95,6 +95,16 @@ contract ProxyUserTest is DeployBase, ProxyUser {
     (, artV) = vat.urns(ilk, urn);
   }
 
+  function testParsePercentString() public {
+    assertEq(dssDeploy.parsePercentString("0.5"), 50);
+    assertEq(dssDeploy.parsePercentString("5"), 500);
+    assertEq(dssDeploy.parsePercentString("15"), 1500);
+    assertEq(dssDeploy.parsePercentString("150"), 15000);
+    assertEq(dssDeploy.parsePercentString("1.50"), 150);
+    assertEq(dssDeploy.parsePercentString("1.25"), 125);
+    assertEq(dssDeploy.parsePercentString("0.25"), 25);
+  }
+
   function testTransfer() public {
     col.mint(10);
     col.transfer(address(proxy), 10);

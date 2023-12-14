@@ -32,7 +32,7 @@ import {DaiJoin} from "src/join.sol";
 import {Flapper} from "src/flap.sol";
 import {Flopper} from "src/flop.sol";
 import {Flipper} from "src/flip.sol";
-import {Clipper} from "src/clip.sol";
+import {Clipper, AbacusLike} from "src/clip.sol";
 import {LinearDecrease, StairstepExponentialDecrease, ExponentialDecrease} from "src/abaci.sol";
 import {Dai} from "src/dai.sol";
 import {Cure} from "src/cure.sol";
@@ -421,29 +421,64 @@ contract DeployScript is Config {
           join = address(new GemJoin(address(vat), iname, token.importx.gem));
         }
         StairstepExponentialDecrease calc = new StairstepExponentialDecrease();
-        // calc.file(bytes32("tau"), 1 hours);
-        calc.file(bytes32("cut"), RAY * ilkx.clipDeploy.calc.cut);
-        calc.file(bytes32("step"), ilkx.clipDeploy.calc.step);
         deployCollateralClip(iname, join, token.importx.pip, address(calc));
+        _setIlk(iname, ilkx);
+      }
+    }
+  }
 
-        // set ilk
-        Ilk memory ilk = ilks[iname];
-        // vat
-        vat.file(iname, bytes32("line"), RAD * ilkx.line);
-        vat.file(iname, bytes32("dust"), RAD * ilkx.dust);
-        // jug
-        // jug.file(iname, bytes32("duty"), WAD * ilkx.duty / PENCENT_DIVIDER);
-        // spotter
-        spotter.file(iname, bytes32("mat"), WAD * ilkx.mat / PENCENT_DIVIDER);
-        // dog
-        dog.file(iname, bytes32("hole"), RAD * ilkx.clipDeploy.hole);
-        dog.file(iname, bytes32("chop"), WAD * ilkx.clipDeploy.chop);
-        // clip
-        ilk.clip.file(bytes32("buf"), WAD * ilkx.clipDeploy.buf / PENCENT_DIVIDER);
-        ilk.clip.file(bytes32("tail"), ilkx.clipDeploy.tail);
-        ilk.clip.file(bytes32("cusp"), WAD * ilkx.clipDeploy.cusp / PENCENT_DIVIDER);
-        ilk.clip.file(bytes32("chip"), WAD * ilkx.clipDeploy.chip / PENCENT_DIVIDER);
-        ilk.clip.file(bytes32("tip"), WAD * ilkx.clipDeploy.tip);
+  function _setIlk(bytes32 iname, Ilkx memory ilkx) internal {
+    // vat
+    vat.file(iname, bytes32("line"), RAD * ilkx.line);
+    vat.file(iname, bytes32("dust"), RAD * ilkx.dust);
+
+    // get clip and calc
+    (address aclip,,,) = dog.ilks(iname);
+    Clipper clip = Clipper(aclip);
+    StairstepExponentialDecrease calc = StairstepExponentialDecrease(address(clip.calc()));
+    // calc
+    calc.file(bytes32("cut"), RAY * ilkx.clipDeploy.calc.cut / PENCENT_DIVIDER);
+    calc.file(bytes32("step"), ilkx.clipDeploy.calc.step);
+
+    // // jug
+    // uint duty = ilkx.duty * 60 * 60 * 24 * 365 * RAY / PENCENT_DIVIDER;
+    // jug.file(iname, bytes32("duty"), duty);
+    // spotter
+    spotter.file(iname, bytes32("mat"), RAY * ilkx.mat / PENCENT_DIVIDER);
+    // dog
+    dog.file(iname, bytes32("hole"), RAD * ilkx.clipDeploy.hole);
+    dog.file(
+      iname, bytes32("chop"), WAD * (PENCENT_DIVIDER + ilkx.clipDeploy.chop) / PENCENT_DIVIDER
+    );
+    // clip
+    clip.file(bytes32("buf"), RAY * ilkx.clipDeploy.buf / PENCENT_DIVIDER);
+    clip.file(bytes32("tail"), ilkx.clipDeploy.tail);
+    clip.file(bytes32("cusp"), RAY * ilkx.clipDeploy.cusp / PENCENT_DIVIDER);
+    clip.file(bytes32("chip"), WAD * ilkx.clipDeploy.chip / PENCENT_DIVIDER);
+    clip.file(bytes32("tip"), RAD * ilkx.clipDeploy.tip);
+  }
+
+  function _setIlks() internal {
+    require(address(vat) != address(0), "vat must deployed before do this");
+    for (uint i = 0; i < tokenNames.length; i++) {
+      bytes32 tname = tokenNames[i];
+      Token memory token = tokens[tname];
+      for (uint j = 0; j < token.ilks.length; j++) {
+        Ilkx memory ilkx = token.ilks[j];
+        bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
+        _setIlk(iname, ilkx);
+      }
+    }
+  }
+
+  function _pokeIlks() internal {
+    for (uint i = 0; i < tokenNames.length; i++) {
+      bytes32 tname = tokenNames[i];
+      Token memory token = tokens[tname];
+      for (uint j = 0; j < token.ilks.length; j++) {
+        Ilkx memory ilkx = token.ilks[j];
+        bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
+        spotter.poke(iname);
       }
     }
   }
@@ -454,23 +489,25 @@ contract DeployScript is Config {
     // dog
     dog.file(bytes32("Hole"), RAD * g.dog_hole);
     // cure
-    cure.file(bytes32("wait"), RAD * g.cure_wait);
+    cure.file(bytes32("wait"), g.cure_wait);
     // end
     end.file(bytes32("wait"), g.end_wait);
     // flap
-    flap.file(bytes32("beg"), WAD * g.flap_beg / PENCENT_DIVIDER);
+    flap.file(bytes32("beg"), WAD * (PENCENT_DIVIDER + g.flap_beg) / PENCENT_DIVIDER);
     flap.file(bytes32("ttl"), g.flap_ttl);
     flap.file(bytes32("tau"), g.flap_tau);
     flap.file(bytes32("lid"), RAD * g.flap_lid);
     // flop
-    flop.file(bytes32("beg"), WAD * g.flop_beg / PENCENT_DIVIDER);
+    flop.file(bytes32("beg"), WAD * (PENCENT_DIVIDER + g.flop_beg) / PENCENT_DIVIDER);
     flop.file(bytes32("ttl"), g.flop_ttl);
     flop.file(bytes32("tau"), g.flop_tau);
-    flop.file(bytes32("pad"), WAD * g.flop_pad / PENCENT_DIVIDER);
+    flop.file(bytes32("pad"), WAD * (PENCENT_DIVIDER + g.flop_pad) / PENCENT_DIVIDER);
     // jug
-    jug.file(bytes32("base"), WAD * g.jug_base / PENCENT_DIVIDER);
+    uint base = g.jug_base * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
+    jug.file(bytes32("base"), base);
     // pot
-    // pot.file(bytes32("dsr"), WAD * g.pot_dsr / PENCENT_DIVIDER);
+    // uint dsr = g.pot_dsr * RAY / PENCENT_DIVIDER/ (60 * 60 * 24 * 365);
+    // pot.file(bytes32("dsr"), dsr);
     // vow
     vow.file(bytes32("wait"), g.vow_wait);
     vow.file(bytes32("dump"), WAD * g.vow_dump);
@@ -621,10 +658,46 @@ contract Deploy2 is DeployScript {
     // OldAdmin(oldAdmin).setDelay(1);
   }
 
+  function _setIlksDuty() internal {
+    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
+    for (uint i = 0; i < tokenNames.length; i++) {
+      bytes32 tname = tokenNames[i];
+      Token memory token = tokens[tname];
+      for (uint j = 0; j < token.ilks.length; j++) {
+        Ilkx memory ilkx = token.ilks[j];
+        bytes32 iname = bytes32(bytes(abi.encodePacked(token.name, "-", ilkx.name)));
+        uint duty = ilkx.duty * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
+        admin.dripAndFile(address(jug), iname, "duty", duty);
+      }
+    }
+  }
+
+  function _setDsrAndBase() internal {
+    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
+    uint dsr = gl.pot_dsr * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
+    admin.dripAndFile(address(pot), "dsr", dsr);
+    uint base = gl.jug_base * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
+    admin.file(address(jug), bytes32("base"), base);
+  }
+
   function _run() internal override {
     // deploy testnet tokens
-    deployTestnetTokens();
+    // deployTestnetTokens();
     // deploy ilks
-    deployIlks();
+    // deployIlks();
+    // setParam(gl);
+    // _setIlks();
+    // vat.file(bytes32("Line"), WAD * 1e9);
+    // uint Art; // Total Normalised Debt     [wad]
+    // uint rate; // Accumulated Rates         [ray]
+    // uint spot; // Price with Safety Margin  [ray]
+    // uint line; // Debt Ceiling              [rad]
+    // uint dust; // Urn Debt Floor            [rad]
+    // (uint art, uint rate, uint spot, uint line, uint dust) = vat.ilks("ETH-A");
+    // console2.log("ETH-A: art, rate, spot", art / WAD, rate / WAD, spot / WAD);
+    // console2.log("ETH-A: line, dust", line / WAD, dust / WAD);
+    // _pokeIlks();
+    _setDsrAndBase();
+    _setIlksDuty();
   }
 }

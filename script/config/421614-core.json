@@ -1,0 +1,86 @@
+[
+  {
+    "name": "DSToken",
+    "addr": "0x6cD1Be8E11790C34eD45E94A2Ce1bA87ef9B6EC9"
+  },
+  {
+    "name": "Authority",
+    "addr": "0x02d48EB7875809031b62D6b33058BE068CE71C30"
+  },
+  {
+    "name": "Vat",
+    "addr": "0x53139FEe446B5493b0546FF7D2634FB7306e839c"
+  },
+  {
+    "name": "Spotter",
+    "addr": "0x127703382d085D0782B7f3265397f8DF241fBC98"
+  },
+  {
+    "name": "Dai",
+    "addr": "0x9714e454274dC66BE57FA8361233221a376f4C2e"
+  },
+  {
+    "name": "DaiJoin",
+    "addr": "0xacd0Fff9B9005F9E7d49851Aab528964D0018200"
+  },
+  {
+    "name": "Jug",
+    "addr": "0x7691624b503821B1cef62F0C449A0377A54851A8"
+  },
+  {
+    "name": "Pot",
+    "addr": "0x7652b8cedc1dc0736784a5e887B7Bae14a082B36"
+  },
+  {
+    "name": "Flapper",
+    "addr": "0xB06f6549bb3F1b35D2DD8fcb8fb5CeedC1E4B25F"
+  },
+  {
+    "name": "Flopper",
+    "addr": "0x8252A74a09A499d26605A12F65c284EdA6f3DAF7"
+  },
+  {
+    "name": "Vow",
+    "addr": "0x1ad6cC437F58c3524A46ea318b7fdAC029AD43d7"
+  },
+  {
+    "name": "Cat",
+    "addr": "0x65a86F9D79638244BD1242FaCDE2510ECc7a1F6c"
+  },
+  {
+    "name": "Dog",
+    "addr": "0x8894E48f58385f0B8C470D726341D0bb88ffC706"
+  },
+  {
+    "name": "Cure",
+    "addr": "0x629683955896E4663e116b1C3a8b68Ae3CB01d94"
+  },
+  {
+    "name": "End",
+    "addr": "0x793B2e0238b5F82CEb5148E9e45c564fd4693ABD"
+  },
+  {
+    "name": "Authority",
+    "addr": "0xD71Dc3f23D1AEe8234542358Dc7e4d88Abbc7Cf3"
+  },
+  {
+    "name": "DSPause",
+    "addr": "0xd66edd76409DA7BBd8c009F80C33Cd685e189260"
+  },
+  {
+    "name": "ESM",
+    "addr": "0xA9ec20a8314984b4654e8e8dF08FF4B9e505E616"
+  },
+  {
+    "name": "DSProxyFactory",
+    "addr": "0x1b9fBD6C72741e542125355a77B60869FAb835eC"
+  },
+  {
+    "name": "ProxyRegistry",
+    "addr": "0xf4ad37532f8d29c88Bd0E856836805aFbCB41C67"
+  },
+  {
+    "name": "Admin",
+    "addr": "0x0F2E678016cCB6b7e3459b16eaCeFFcB9b975a18"
+  }
+]

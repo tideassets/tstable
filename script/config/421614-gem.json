@@ -1,0 +1,262 @@
+[
+  {
+    "name": "DSValue",
+    "addr": "0x0110F46e685ac0b79EcA4aaB8A7b70D02df8Eb6B"
+  },
+  {
+    "name": "WETH9_",
+    "addr": "0xceBD1a3E9aaD7E60eDD509809e7f9cFF449b7851"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x73917397B8C2bbf919F7b095aea0dAaa6a35B661"
+  },
+  {
+    "name": "USDC",
+    "addr": "0x39E618D761fdD06bF65065d2974128aAeC7b3Fed"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x1AA200A442811074eB356E9B2572E560681DaeB7"
+  },
+  {
+    "name": "LINK",
+    "addr": "0xaB7A6599C1804443C04c998D2be87Dc00A8c07bA"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0xa0C8A21cB5293af9c20424bFAedD81EfD00EA287"
+  },
+  {
+    "name": "AAVE",
+    "addr": "0x0FDc113b620F994fa7FE03b7454193f519494D40"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x296fFeE7c355196b618569Ec32FDbB8fe063A5bd"
+  },
+  {
+    "name": "WBTC",
+    "addr": "0x4Ac0ED77C4375D48B51D56cc49b7710c3640b9c2"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0xb7984AbD7A93ABd51c0451A7fc5256F99DC03E57"
+  },
+  {
+    "name": "BAT",
+    "addr": "0x27880d3ff48265b15FacA7109070be82eC9c861b"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x44b8CF3240401fE4681991e560e82178496464eD"
+  },
+  {
+    "name": "USDT",
+    "addr": "0xEF64357875D7B0108642d61B99072935B81b1384"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x975E2F8EA048B0d2aaC280e7049C5857aDaC933B"
+  },
+  {
+    "name": "UNI",
+    "addr": "0xCB774CF40CfFc88190d27D5c628094d2ca5650B4"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0xA5b6ef6d0705D129258Fd66a59382D9457A81Bf7"
+  },
+  {
+    "name": "MATIC",
+    "addr": "0x6308A5473106B3b178bD8bDa1eFe4F5E930D957D"
+  },
+  {
+    "name": "DSValue",
+    "addr": "0x7219dF52C6292519F3D38eC773c2c991F9aF3fC2"
+  },
+  {
+    "name": "ZRX",
+    "addr": "0xB818B91b7e95d03382e9508e3363526b1Ef6d674"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x6904819Dc93F820a106572125DcFab2d43cd2f95"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x0101E55939be95Dc20c9B794370579c652912415"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x0Ee284E167741cAe6531FD594EFd06E889d49413"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x5199883969dc50AA3cDEE614C04c46d1b63BB962"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x3f36a2D55DD09A3Cf8508f825e7268FB8FFF95F5"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x8389ae7d186435a2380E7EE9d2E0EbE7483Da39b"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x1392366091ad3d1C94465b24eb07862d1A79035D"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xe2D6E9Ad39D3c4F0203dE0203d15D01c456e6fef"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x8A1d1C8AF2041D8D7566712f845a43EaF6128407"
+  },
+  {
+    "name": "GemJoin5",
+    "addr": "0xE2bac20dce148219E0B331000ecd3424aF2773Fe"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x4AA07cCd343B5383667fDF71BE15eC7E49214406"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x0790d9dB802Ac64e5F4026bBe20727276E4F148A"
+  },
+  {
+    "name": "GemJoin5",
+    "addr": "0x6662eD37bCC5D4170af5F5547f0Ec8f62F20F0ae"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xBEFce7b0864484D389DA75E997E08b4F4c026CA0"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x742397265F65b871C7A8336b82DC1a27db594fAd"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0xdbf8ACb10D8d8CA90d049e1F8DBfC4d5C27eCc90"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x7A2864c7C1E7516063Fc7520B8ee194315b53c2c"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0xD6915165df91430ed5f65d9A3bdC79D350546B01"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x141cA6F8375409b2346B14c30C8E919b1182cBE6"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x0Bd4B97Da90f84926f231e849448ae60Ba128112"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0xFd0E746Df51F69bBA84Fe1daf5Ba6fF3192c6213"
+  },
+  {
+    "name": "GemJoin5",
+    "addr": "0x8A6B06fEAEb43D0Ce39eeE0c4e89Cb4d6153504b"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x2133A8Ea11dd8f27359366d5398D95DCbBe40c1a"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0xfcDc2b38A303b6ab2bdfB71a9fF6302489963607"
+  },
+  {
+    "name": "GemJoin5",
+    "addr": "0xB3E08Cd6d41cAa75064fC1606A0f7249FD160644"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x39AA62C1A69707ce2C1A97934a4D50bf5BAC9377"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x0ab73C57ba531951D40f5382A15d83fE0c3f973f"
+  },
+  {
+    "name": "GemJoin5",
+    "addr": "0x480f27AD3Be664805C5DBB8205e70FE45f52e74A"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xcc4f95e344EC5a2aF392986Bfe79B2091d0Cfc76"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x6f16F462Cc9C33b1069F6d2c9C4fD47aa00B0302"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x6b33A9fDdAaCfC44A7FD988d4429d73FbCD94759"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xda8A846CEE79158D2d0dD91DebFcCEB14A4cfC57"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0xdEB39e601572D4FCE7C98D687eD6E9eD8D4777bC"
+  },
+  {
+    "name": "GemJoin7",
+    "addr": "0x111F0E4035Ee9Ff231B7FC20C1e81ee638cf6070"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xd9C6e57787864c83EA79654E9B05877A4Ebc39d1"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0xB41e2834558B035f7e8269C4b03E7d2412F879CC"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x16933f4F84C7E76baFaBD5d89bCa304e9BeE43C7"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x0d97F27F77bfb69BFBfbC8136238A8907ef35079"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x731c7992c91072d58A9c1c97441c8ae3893285Ac"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0x8D15830395dF327224170bc103a727F7a587593E"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0xF24E45eaefbf0286e0973710F5609cd190534c20"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x2E1F785730970e9C51d23ae2030638c6cC760Ab5"
+  },
+  {
+    "name": "GemJoin",
+    "addr": "0xe63fb52D2d915773e5579A0Ee49815d0cc688D75"
+  },
+  {
+    "name": "StairstepExponentialDecrease",
+    "addr": "0x777E9EE68C807eFC8A9AE6a5939dCB78B527B684"
+  },
+  {
+    "name": "Clipper",
+    "addr": "0x3Cf1C5cfbA4E17B9F5d9cDeaa80EeCd6F8610737"
+  }
+]
