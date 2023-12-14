@@ -688,11 +688,6 @@ contract Deploy2 is DeployScript {
     // setParam(gl);
     // _setIlks();
     // vat.file(bytes32("Line"), WAD * 1e9);
-    // uint Art; // Total Normalised Debt     [wad]
-    // uint rate; // Accumulated Rates         [ray]
-    // uint spot; // Price with Safety Margin  [ray]
-    // uint line; // Debt Ceiling              [rad]
-    // uint dust; // Urn Debt Floor            [rad]
     // (uint art, uint rate, uint spot, uint line, uint dust) = vat.ilks("ETH-A");
     // console2.log("ETH-A: art, rate, spot", art / WAD, rate / WAD, spot / WAD);
     // console2.log("ETH-A: line, dust", line / WAD, dust / WAD);

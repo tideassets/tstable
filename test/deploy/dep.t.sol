@@ -103,8 +103,8 @@ contract DeployBase is Test, ProxyActions {
   }
 
   function _dssDeploy() internal {
-    dssDeploy.setup();
-    // dssDeploy.dssDeploy(99, 10);
+    // dssDeploy.setup();
+    dssDeploy.dssDeploy(99, 0);
     vat = dssDeploy.vat();
     jug = dssDeploy.jug();
     vow = dssDeploy.vow();
