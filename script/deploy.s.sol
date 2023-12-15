@@ -653,9 +653,9 @@ contract Deploy2 is DeployScript {
   }
 
   function _onlyTry() internal {
-    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
-    admin.changeDelay(0, true);
-    // OldAdmin(oldAdmin).setDelay(1);
+    Admin admin = new Admin(address(pause));
+    pauseAuth(address(admin));
+    admin.file(address(vat), "Line", 1e9 * RAD);
   }
 
   function _setIlksDuty() internal {
@@ -692,7 +692,8 @@ contract Deploy2 is DeployScript {
     // console2.log("ETH-A: art, rate, spot", art / WAD, rate / WAD, spot / WAD);
     // console2.log("ETH-A: line, dust", line / WAD, dust / WAD);
     // _pokeIlks();
-    _setDsrAndBase();
-    _setIlksDuty();
+    // _setDsrAndBase();
+    // _setIlksDuty();
+    _onlyTry();
   }
 }

@@ -7,7 +7,9 @@ import {Test, console2, Vm} from "forge-std/Test.sol";
 import {FakeUser} from "dss-deploy/DssDeploy.t.base.sol";
 import {GemJoin} from "src/join.sol";
 import {LinearDecrease} from "src/abaci.sol";
-import {ProxyActions, Admin} from "script/admin.sol";
+import {AdminActions, Admin} from "script/admin.sol";
+
+contract ProxyActions is AdminActions {}
 
 contract DeployScriptTest is Test {
   DeployScript public deploy;

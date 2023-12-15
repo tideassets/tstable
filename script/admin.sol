@@ -118,7 +118,7 @@ contract AdminActions is DSAuth {
     _exec(msg.data);
   }
 
-  function setAuth(address, address) external auth {
+  function setAuth(address) external auth {
     _exec(msg.data);
   }
 
