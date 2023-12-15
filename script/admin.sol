@@ -21,171 +21,121 @@ contract Authority is DSAuth, DSAuthority {
   }
 }
 
-contract ProxyActions is DSAuth {
+// if delay > 0,  the action should be executed twice: once for scheduling (plot) and once for actual execution (exec).
+// You can also call it only once, then wait for enough time (the last call time + delay),
+// and call execAll to execute all the actions added before in once go.
+contract AdminActions is DSAuth {
+  uint public delay;
   DSPause public pause;
   GovActions public govActions;
-  uint delay;
 
-  function rely(address from, address to) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  struct ActInfo {
+    bytes fax;
+    uint eta;
   }
 
-  function deny(address from, address to) external auth {
+  mapping(address => ActInfo[]) public acts;
+  mapping(address => mapping(bytes32 => uint)) public indexs;
+  mapping(address => mapping(bytes32 => uint)) public plats;
+
+  function _exec(bytes memory fax) internal {
     address usr = address(govActions);
     bytes32 tag;
     assembly {
       tag := extcodehash(usr)
     }
-    bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
     uint eta = block.timestamp + delay;
 
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+    if (delay > 0) {
+      bytes32 data = keccak256(fax);
+      uint eta_ = plats[msg.sender][data];
+      if (eta_ == 0) {
+        plats[msg.sender][data] = eta;
+        pause.plot(usr, tag, (fax), eta);
+
+        indexs[msg.sender][data] = acts[msg.sender].length;
+        acts[msg.sender].push(ActInfo(fax, eta));
+      } else {
+        require(eta_ < block.timestamp, "delayed");
+        plats[msg.sender][data] = 0;
+        pause.exec(usr, tag, fax, eta_);
+
+        ActInfo[] storage acts_ = acts[msg.sender];
+        ActInfo memory last = acts_[acts_.length - 1];
+        acts_[indexs[msg.sender][data]] = last;
+        acts_.pop();
+      }
+    } else {
+      pause.plot(usr, tag, fax, eta);
+      pause.exec(usr, tag, fax, eta);
+    }
   }
 
-  function file(address who, bytes32 what, uint data) external auth {
+  function _execActs() internal {
     address usr = address(govActions);
     bytes32 tag;
     assembly {
       tag := extcodehash(usr)
     }
-    bytes memory fax = abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+    ActInfo[] storage acts_ = acts[msg.sender];
+    for (uint i = 0; i < acts_.length; i++) {
+      ActInfo memory act = acts_[i];
+      require(act.eta <= block.timestamp, "delayed");
+      pause.exec(usr, tag, act.fax, act.eta);
+    }
+    delete acts[msg.sender];
   }
 
-  function file(address who, bytes32 ilk, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function execAll() external auth {
+    _execActs();
   }
 
-  function dripAndFile(address who, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function rely(address, address) external auth {
+    _exec(msg.data);
   }
 
-  function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax =
-      abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function deny(address, address) external auth {
+    _exec(msg.data);
   }
 
-  function cage(address end) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("cage(address)", end);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function file(address, bytes32, uint) external auth {
+    _exec(msg.data);
   }
 
-  function setAuth(address newAuthority) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function file(address, bytes32, bytes32, uint) external auth {
+    _exec(msg.data);
   }
 
-  function setDelay(uint newDelay) public auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-    uint eta = block.timestamp + delay;
-
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function dripAndFile(address, bytes32, uint) external auth {
+    _exec(msg.data);
   }
 
-  function setAuthorityAndDelay(address newAuthority, uint newDelay) external {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature(
-      "setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay
-    );
-    uint eta = block.timestamp + delay;
+  function dripAndFile(address, bytes32, bytes32, uint) external auth {
+    _exec(msg.data);
+  }
 
-    pause.plot(usr, tag, fax, eta);
-    pause.exec(usr, tag, fax, eta);
+  function cage(address) external auth {
+    _exec(msg.data);
+  }
+
+  function setAuth(address, address) external auth {
+    _exec(msg.data);
+  }
+
+  function setDelay(uint delay_) public auth {
+    delay = delay_;
+    _exec(msg.data);
+  }
+
+  function setAuthorityAndDelay(address, uint delay_) external auth {
+    delay = delay_;
+    _exec(msg.data);
   }
 }
 
-contract Admin is ProxyActions {
-  uint public pauseEta;
-
+contract Admin is AdminActions {
   constructor(address pause_) {
-    // delay = 10;
     pause = DSPause(pause_);
     govActions = new GovActions();
-  }
-
-  function changeDelay(uint newDelay, bool exec) external auth {
-    address usr = address(govActions);
-    bytes32 tag;
-    assembly {
-      tag := extcodehash(usr)
-    }
-    bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
-    uint eta = block.timestamp + delay;
-
-    if (!exec) {
-      pauseEta = eta;
-      pause.plot(usr, tag, fax, eta);
-    } else {
-      pause.exec(usr, tag, fax, pauseEta);
-    }
-    delay = newDelay;
   }
 }
