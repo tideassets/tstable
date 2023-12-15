@@ -652,14 +652,16 @@ contract Deploy2 is DeployScript {
     console2.log("oldAdmin", oldAdmin);
   }
 
-  function _onlyTry() internal {
+  function _setNewAdmin() internal {
     Admin admin = new Admin(address(pause));
     pauseAuth(address(admin));
     admin.file(address(vat), "Line", 1e9 * RAD);
+
+    // new admin address is 0x8304A75e118D5e59Df8B90A556A72584BFd6CB6f
   }
 
   function _setIlksDuty() internal {
-    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
+    Admin admin = Admin(0x8304A75e118D5e59Df8B90A556A72584BFd6CB6f);
     for (uint i = 0; i < tokenNames.length; i++) {
       bytes32 tname = tokenNames[i];
       Token memory token = tokens[tname];
@@ -673,14 +675,16 @@ contract Deploy2 is DeployScript {
   }
 
   function _setDsrAndBase() internal {
-    Admin admin = Admin(0x8cDf2e4B7488dAaa4963c23eFfa5c5247C921FaC);
+    Admin admin = Admin(0x8304A75e118D5e59Df8B90A556A72584BFd6CB6f);
     uint dsr = gl.pot_dsr * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
     admin.dripAndFile(address(pot), "dsr", dsr);
     uint base = gl.jug_base * RAY / PENCENT_DIVIDER / (60 * 60 * 24 * 365);
     admin.file(address(jug), bytes32("base"), base);
   }
 
-  function _run() internal override {
+  function _onlyTry() internal {}
+
+  function _run() internal virtual override {
     // deploy testnet tokens
     // deployTestnetTokens();
     // deploy ilks
