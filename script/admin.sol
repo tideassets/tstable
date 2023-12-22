@@ -36,7 +36,7 @@ contract AdminActions is DSAuth {
 
   mapping(address => ActInfo[]) public acts;
   mapping(address => mapping(bytes32 => uint)) public indexs;
-  mapping(address => mapping(bytes32 => uint)) public plats;
+  mapping(address => mapping(bytes32 => uint)) public plans;
 
   function _exec(bytes memory fax) internal {
     address usr = address(govActions);
@@ -48,22 +48,28 @@ contract AdminActions is DSAuth {
 
     if (delay > 0) {
       bytes32 data = keccak256(fax);
-      uint eta_ = plats[msg.sender][data];
+      uint eta_ = plans[msg.sender][data];
       if (eta_ == 0) {
-        plats[msg.sender][data] = eta;
+        plans[msg.sender][data] = eta;
         pause.plot(usr, tag, (fax), eta);
 
-        indexs[msg.sender][data] = acts[msg.sender].length;
         acts[msg.sender].push(ActInfo(fax, eta));
+        indexs[msg.sender][data] = acts[msg.sender].length;
       } else {
         require(eta_ < block.timestamp, "delayed");
-        plats[msg.sender][data] = 0;
+        plans[msg.sender][data] = 0;
         pause.exec(usr, tag, fax, eta_);
 
         ActInfo[] storage acts_ = acts[msg.sender];
-        ActInfo memory last = acts_[acts_.length - 1];
-        acts_[indexs[msg.sender][data]] = last;
+        mapping(bytes32 => uint) storage indexs_ = indexs[msg.sender];
+        uint index = indexs_[data] - 1;
+        if (index != acts_.length - 1) {
+          ActInfo memory last = acts_[acts_.length - 1];
+          acts_[index] = last;
+          indexs_[keccak256(last.fax)] = index + 1;
+        }
         acts_.pop();
+        delete indexs_[data];
       }
     } else {
       pause.plot(usr, tag, fax, eta);
